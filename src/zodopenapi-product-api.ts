@@ -103,19 +103,19 @@ if (routeConfig.request) {
 
   switch (routeConfig.method) {
     case "get":
-      expressRoute.get(validationMiddleware, controllerHandler);
+      expressRoute.get(validationMiddleware, routeConfig.handler);
       break;
     case "patch":
-      expressRoute.patch(validationMiddleware, controllerHandler);
+      expressRoute.patch(validationMiddleware, routeConfig.handler);
       break;
     case "post":
-      expressRoute.post(validationMiddleware, controllerHandler);
+      expressRoute.post(validationMiddleware, routeConfig.handler);
       break;
     case "put":
-      expressRoute.put(validationMiddleware, controllerHandler);
+      expressRoute.put(validationMiddleware, routeConfig.handler);
       break;
     case "delete":
-      expressRoute.delete(validationMiddleware, controllerHandler);
+      expressRoute.delete(validationMiddleware, routeConfig.handler);
       break;
     default:
       throw new Error(
