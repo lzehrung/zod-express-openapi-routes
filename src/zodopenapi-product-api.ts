@@ -17,11 +17,6 @@ import { productSchema, routeParams } from "./product-api-schema";
 import { ProductController } from "./product-controller";
 import { Product } from "./db-models";
 
-// type TReq = TypedRequest;
-// type TRes = Response;
-//
-// type TypedRequestHandler<TRequest<TP, TB, TQ> extends TypedRequest<TP, TB, TQ>, TResponse extends TRes = TRes> = (req: TRequest, res: TResponse, next: NextFunction) => void;
-
 type ZodSchemer = ZodType<any, ZodTypeDef, any>;
 
 type AllReqVal<
@@ -36,10 +31,10 @@ type AllReqVal<
 type TypedHandler<TReqVal extends AllReqVal, TResp> = (
   req: TReqVal,
   res: Response<TResp>,
-  next: NextFunction
+  next?: NextFunction
 ) => void;
 
-type ExtendedRouteConfig<
+type ApiRoute<
   TParams extends ZodSchemer = ZodSchemer,
   TBody extends ZodSchemer = ZodSchemer,
   TQuery extends ZodSchemer = ZodSchemer,
@@ -49,37 +44,38 @@ type ExtendedRouteConfig<
     params?: TParams;
     body?: TBody;
     query?: TQuery;
+    headers?: ZodSchemer;
   };
-  handler: TypedHandler<AllReqVal<TParams, TBody, TQuery>, TResponse>;
+  handler: TypedHandler<TypedRequest<TParams, TBody, TQuery>, TResponse>;
 };
+
+type ApiRouteParams<TParams extends ZodSchemer, TResponse> = ApiRoute<TParams, any, any, TResponse>;
+type ApiRouteBody<TBody extends ZodSchemer, TResponse> = ApiRoute<any, TBody, any, TResponse>;
+type ApiRouteQuery<TQuery extends ZodSchemer, TResponse> = ApiRoute<any, any, TQuery, TResponse>;
 
 const registry = new OpenAPIRegistry();
 const productRoutes = express.Router();
 
-const routeConfig: ExtendedRouteConfig<
-  typeof routeParams,
-  any,
-  any,
-  Product
-> = {
-  path: "/products/{id}",
-  method: "get",
-  description: "Get a single product",
-  request: {
-    params: routeParams,
-  },
-  handler: ProductController.getProduct,
-  responses: {
-    200: {
-      description: "Get a single product",
-      content: {
-        "application/json": {
-          schema: productSchema,
+const routeConfig: ApiRouteParams<typeof routeParams, Product> =
+  {
+    path: "/products/{id}",
+    method: "get",
+    description: "Get a single product",
+    request: {
+      params: routeParams,
+    },
+    handler: ProductController.getProduct,
+    responses: {
+      200: {
+        description: "Get a single product",
+        content: {
+          "application/json": {
+            schema: productSchema,
+          },
         },
       },
     },
-  },
-};
+  };
 
 if (routeConfig.request) {
   let expressPath = routeConfig.path;

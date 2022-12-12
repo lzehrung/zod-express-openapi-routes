@@ -1,4 +1,4 @@
-import {TypedRequest, TypedRequestParams} from "zod-express-middleware";
+import {TypedRequest, TypedRequestParams, TypedRequestQuery} from "zod-express-middleware";
 import {Response} from "express";
 import {Product} from "./db-models";
 import {ServiceRepository} from "./service-repository";
