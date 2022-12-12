@@ -1,9 +1,26 @@
 import express from "express";
-import { docs, productRoutes } from "./zodopenapi-product-api";
+import { registerProductRoutes } from "./product-routes";
+import { z } from "zod";
+import {
+  extendZodWithOpenApi,
+  OpenAPIGenerator,
+  OpenAPIRegistry,
+} from "@asteasolutions/zod-to-openapi";
+extendZodWithOpenApi(z);
+
+const registry = new OpenAPIRegistry();
 
 const router = express.Router();
-router.use(productRoutes);
+registerProductRoutes(registry, router);
+
 router.use("/swagger.json", (req, res) => {
+  const docGen = new OpenAPIGenerator(registry.definitions, "3.0.0");
+  const docs = docGen.generateDocument({
+    info: {
+      title: "ACME API",
+      version: "1.0.0",
+    },
+  });
   res.json(docs);
 });
 
