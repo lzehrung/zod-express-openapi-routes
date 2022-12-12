@@ -16,7 +16,7 @@ import {
 import { routeParams } from "./product-api-schema";
 import { ZodRequestBody } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
-/** Reusable type for ensuring numeric string parameters in exress routes */
+/** Reusable type for ensuring numeric string parameters in express routes */
 export const numericString = z.preprocess(Number, z.number());
 
 type ApiZodType = ZodType<any, ZodTypeDef, any>;
@@ -90,11 +90,11 @@ export function registerRoute(
     let expressRoute = router.route(expressPath);
 
     let bodySchema: ZodSchema | undefined = undefined;
-    const bodyProps = Object.getOwnPropertyNames(
+    const bodyContent = Object.getOwnPropertyNames(
       routeConfig.request.body?.content || {}
     );
-    if (bodyProps.length > 0) {
-      const firstContentType = bodyProps[0];
+    if (bodyContent.length > 0) {
+      const firstContentType = bodyContent[0];
       bodySchema = (routeConfig.request.body as ZodRequestBody).content[
         firstContentType
       ].schema as ZodSchema;
