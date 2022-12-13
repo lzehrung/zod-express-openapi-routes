@@ -2,12 +2,17 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { Request, Response, Router } from "express";
 import { productsSchema, productSchema, getProductParams } from "./api-schema";
 import { ProductController } from "./product-controller";
-import { Product } from "../db-models";
+import { Product } from "../db/models";
 import {
   ApiRouteNoInput,
   ApiRouteParams,
   registerRoute,
 } from "../open-api-helper";
+
+// these route definitions are used to:
+// - configure express routes
+// - generate OpenAPI docs
+// - validate the request handler parameter and return types according to zod schema anchored to db model
 
 const getProductsRoute: ApiRouteNoInput<Product[]> = {
   path: "/products",

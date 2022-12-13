@@ -1,5 +1,5 @@
 import { toZod } from "tozod";
-import { Product } from "../db-models";
+import { Product } from "../db/models";
 import { z } from "zod";
 import { numericPathParam } from "../open-api-helper";
 

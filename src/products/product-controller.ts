@@ -2,7 +2,7 @@ import {
   TypedRequestParams
 } from "zod-express-middleware";
 import { Request, Response } from "express";
-import { Product } from "../db-models";
+import { Product } from "../db/models";
 import { ProductRepository } from "./product-repository";
 import { getProductParams } from "./api-schema";
 

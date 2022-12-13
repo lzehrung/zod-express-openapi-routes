@@ -1,4 +1,4 @@
-import { Product } from "../db-models";
+import { Product } from "../db/models";
 
 const products = new Array<Product>();
 for (let i = 1; i <= 10; i++) {
