@@ -1,12 +1,9 @@
-import { Router, Request, RequestHandler } from "express";
+import { Router, RequestHandler } from "express";
 import {
   z,
-  ZodTypeAny,
   ZodSchema,
   ZodType,
   ZodTypeDef,
-  ZodAny,
-  ZodRawShape,
   AnyZodObject,
 } from "zod";
 import {
@@ -19,10 +16,8 @@ import { NextFunction, Response } from "express";
 import {
   processRequest,
   TypedRequest,
-  TypedRequestBody,
   TypedRequestParams,
-  TypedRequestQuery,
-  validateRequest,
+  TypedRequestQuery
 } from "zod-express-middleware";
 import { ZodRequestBody } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
@@ -113,7 +108,7 @@ export function registerRoute(
   const paramsShape = routeConfig.request?.params?.shape;
   if (paramsShape) {
     for (const prop of Object.getOwnPropertyNames(paramsShape)) {
-      console.log(`converting param {${prop}} in ${routeConfig.path} to express format :${prop}`);
+      console.log(`converting {${prop}} in ${routeConfig.path} to :${prop}`);
       expressPath = expressPath.replace(`{${prop}}`, `:${prop}`);
     }
   }
