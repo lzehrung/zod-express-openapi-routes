@@ -30,16 +30,6 @@ import { ParameterObject } from "openapi3-ts/src/model/OpenApi";
 /** Ensure string value is numeric. */
 export const numString = z.preprocess(Number, z.number());
 
-/** Ensure string value is numeric in an express url parameter/segment. */
-export const numParam = (name: string, required = true) =>
-  numString.openapi({
-    param: {
-      in: "path",
-      required,
-      name
-    },
-  });
-
 type ApiZodType = ZodType<any, ZodTypeDef, any>;
 
 export type AllReqVal<
