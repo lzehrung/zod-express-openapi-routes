@@ -2,7 +2,7 @@
 import { toZod } from "tozod";
 import { Product } from "./db-models";
 import { z } from "zod";
-import { numericString } from "./open-api-helper";
+import { numParam } from "./open-api-helper";
 
 export const productSchema: toZod<Product> = z.object({
   id: z.number(),
@@ -11,6 +11,8 @@ export const productSchema: toZod<Product> = z.object({
   categories: z.array(z.string()),
 });
 
-export const routeParams = z.object({
-  id: numericString,
+export const productsSchema: toZod<Product[]> = z.array(productSchema);
+
+export const getProductParams = z.object({
+  id: numParam(),
 });

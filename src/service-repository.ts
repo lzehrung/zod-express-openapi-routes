@@ -1,12 +1,21 @@
 import { Product } from "./db-models";
 
+const products = new Array<Product>();
+for (let i = 1; i <= 10; i++) {
+  products.push({
+    id: i,
+    name: `Product ${i}`,
+    price: i * 10,
+    categories: [`category-${i * 25}`],
+  });
+}
+
 export class ServiceRepository {
   static getProduct(id: number): Product | null {
-    return {
-      id: id,
-      name: `Product ${id}`,
-      price: id * 10,
-      categories: [`Category ${id * 3}`],
-    };
+    return products.find((p) => p.id === id) || null;
+  }
+
+  static getProducts(): Product[] {
+    return products;
   }
 }
