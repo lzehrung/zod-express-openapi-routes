@@ -7,7 +7,7 @@ import {
   ApiRouteNoInput,
   ApiRouteParams,
   registerRoute,
-} from "../open-api-helper";
+} from "../open-api-helpers";
 
 // these route definitions are used to:
 // - configure express routes

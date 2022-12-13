@@ -1,7 +1,7 @@
 import { toZod } from "tozod";
 import { Product } from "../db/models";
 import { z } from "zod";
-import { numericPathParam } from "../open-api-helper";
+import { numericPathParam } from "../open-api-helpers";
 
 // single product zod schema (checked against the db model interface using toZod)
 export const productSchema: toZod<Product> = z.object({
