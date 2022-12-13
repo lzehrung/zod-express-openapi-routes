@@ -1,9 +1,4 @@
-import { z } from "zod";
-import {
-  extendZodWithOpenApi,
-  OpenAPIRegistry,
-} from "@asteasolutions/zod-to-openapi";
-extendZodWithOpenApi(z);
+import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { Router } from "express";
 import {
   productsSchema,

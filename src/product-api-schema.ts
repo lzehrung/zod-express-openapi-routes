@@ -14,5 +14,5 @@ export const productSchema: toZod<Product> = z.object({
 export const productsSchema: toZod<Product[]> = z.array(productSchema);
 
 export const getProductParams = z.object({
-  id: numParam(),
+  id: z.coerce.number()
 });

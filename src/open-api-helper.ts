@@ -17,6 +17,7 @@ import {
 extendZodWithOpenApi(z);
 import { NextFunction, Response } from "express";
 import {
+  processRequest,
   TypedRequest,
   TypedRequestBody,
   TypedRequestParams,
@@ -30,11 +31,12 @@ import { ParameterObject } from "openapi3-ts/src/model/OpenApi";
 export const numString = z.preprocess(Number, z.number());
 
 /** Ensure string value is numeric in an express url parameter/segment. */
-export const numParam = (required = true) =>
+export const numParam = (name: string, required = true) =>
   numString.openapi({
     param: {
       in: "path",
-      required: required,
+      required,
+      name
     },
   });
 
@@ -133,7 +135,7 @@ export function registerRoute(
       firstContentType
     ].schema as ZodSchema;
   }
-  const validationMiddleware = validateRequest({
+  const validationMiddleware = processRequest({
     params: routeConfig.request?.params,
     body: bodySchema,
     query: routeConfig.request?.query,

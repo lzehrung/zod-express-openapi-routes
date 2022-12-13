@@ -1,5 +1,4 @@
 import express from "express";
-import { registerProductRoutes } from "./product-routes";
 import { z } from "zod";
 import {
   extendZodWithOpenApi,
@@ -7,6 +6,8 @@ import {
   OpenAPIRegistry,
 } from "@asteasolutions/zod-to-openapi";
 extendZodWithOpenApi(z);
+
+import { registerProductRoutes } from "./product-routes";
 
 const registry = new OpenAPIRegistry();
 
@@ -25,7 +26,7 @@ router.use("/swagger.json", (req, res) => {
 });
 
 const app = express();
-app.use('/', router);
+app.use(router);
 
 app.listen(3000, () => {
   console.log("Server started http://localhost:3000");
