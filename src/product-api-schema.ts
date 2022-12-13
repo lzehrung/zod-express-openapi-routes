@@ -2,6 +2,7 @@
 import { toZod } from "tozod";
 import { Product } from "./db-models";
 import { z } from "zod";
+import { numericPathParam } from "./open-api-helper";
 
 export const productSchema: toZod<Product> = z.object({
   id: z.number(),
@@ -13,10 +14,5 @@ export const productSchema: toZod<Product> = z.object({
 export const productsSchema: toZod<Product[]> = z.array(productSchema);
 
 export const getProductParams = z.object({
-  id: z.coerce.number().openapi({
-    param: {
-      in: "path",
-      required: true
-    }
-  })
+  id: numericPathParam,
 });

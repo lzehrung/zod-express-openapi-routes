@@ -25,12 +25,16 @@ import {
   validateRequest,
 } from "zod-express-middleware";
 import { ZodRequestBody } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
-import { ParameterObject } from "openapi3-ts/src/model/OpenApi";
 
 /** Ensure string value is numeric. */
 export const numString = z.preprocess(Number, z.number());
 
-type ApiZodType = ZodType<any, ZodTypeDef, any>;
+export const numericPathParam = z.coerce.number().openapi({
+  param: {
+    in: "path",
+    required: true,
+  },
+});
 
 export type AllReqVal<
   TParams extends AnyZodObject = AnyZodObject,
