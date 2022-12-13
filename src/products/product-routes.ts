@@ -1,17 +1,13 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-import { Router } from "express";
-import {
-  productsSchema,
-  productSchema,
-  getProductParams,
-} from "./product-api-schema";
+import { Request, Response, Router } from "express";
+import { productsSchema, productSchema, getProductParams } from "./api-schema";
 import { ProductController } from "./product-controller";
-import { Product } from "./db-models";
+import { Product } from "../db-models";
 import {
   ApiRouteNoInput,
   ApiRouteParams,
   registerRoute,
-} from "./open-api-helper";
+} from "../open-api-helper";
 
 const getProductsRoute: ApiRouteNoInput<Product[]> = {
   path: "/products",
@@ -19,6 +15,10 @@ const getProductsRoute: ApiRouteNoInput<Product[]> = {
   description: "Get all products",
   handler: ProductController.getProducts,
   tags: ["products"],
+  middleware: [(req: Request, res: Response, next) => {
+    console.log('example middleware', req.path);
+    next();
+  }],
   responses: {
     200: {
       description: "Product list",

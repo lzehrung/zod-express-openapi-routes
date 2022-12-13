@@ -8,7 +8,7 @@ import {
 } from "@asteasolutions/zod-to-openapi";
 extendZodWithOpenApi(z);
 
-import { registerProductRoutes } from "./product-routes";
+import { registerProductRoutes } from "./products/product-routes";
 
 const registry = new OpenAPIRegistry();
 

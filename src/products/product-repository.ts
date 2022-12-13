@@ -1,4 +1,4 @@
-import { Product } from "./db-models";
+import { Product } from "../db-models";
 
 const products = new Array<Product>();
 for (let i = 1; i <= 10; i++) {
@@ -10,7 +10,7 @@ for (let i = 1; i <= 10; i++) {
   });
 }
 
-export class ServiceRepository {
+export class ProductRepository {
   static getProduct(id: number): Product | null {
     return products.find((p) => p.id === id) || null;
   }
