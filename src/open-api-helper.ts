@@ -27,9 +27,10 @@ import {
 import { ZodRequestBody } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
 /** Ensure string value is numeric. */
-export const numString = z.preprocess(Number, z.number());
+export const numericString = z.coerce.number();
 
-export const numericPathParam = z.coerce.number().openapi({
+/** Ensure url/path segment/param is numeric */
+export const numericPathParam = numericString.openapi({
   param: {
     in: "path",
     required: true,
@@ -112,7 +113,7 @@ export function registerRoute(
   const paramsShape = routeConfig.request?.params?.shape;
   if (paramsShape) {
     for (const prop of Object.getOwnPropertyNames(paramsShape)) {
-      console.log(`express'ing param ${prop} in ${routeConfig.path}`);
+      console.log(`converting param {${prop}} in ${routeConfig.path} to express format :${prop}`);
       expressPath = expressPath.replace(`{${prop}}`, `:${prop}`);
     }
   }

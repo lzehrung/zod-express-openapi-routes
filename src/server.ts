@@ -1,3 +1,4 @@
+import path from 'path';
 import express from "express";
 import { z } from "zod";
 import {
@@ -13,6 +14,10 @@ const registry = new OpenAPIRegistry();
 
 const router = express.Router();
 registerProductRoutes(registry, router);
+
+router.use('/api-docs', (req, res) => {
+  res.sendFile(path.join(__dirname, './templates/api-docs.html'));
+});
 
 router.use("/swagger.json", (req, res) => {
   const docGen = new OpenAPIGenerator(registry.definitions, "3.0.0");

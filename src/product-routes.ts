@@ -18,6 +18,7 @@ const getProductsRoute: ApiRouteNoInput<Product[]> = {
   method: "get",
   description: "Get all products",
   handler: ProductController.getProducts,
+  tags: ["products"],
   responses: {
     200: {
       description: "Product list",
@@ -38,6 +39,7 @@ const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
     params: getProductParams,
   },
   handler: ProductController.getProduct,
+  tags: ["products"],
   responses: {
     200: {
       description: "Product",
