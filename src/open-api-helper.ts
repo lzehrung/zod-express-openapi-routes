@@ -113,8 +113,10 @@ export function registerRoute(
   router: Router
 ): void {
   let expressPath = routeConfig.path;
-  if (routeConfig.request?.params) {
-    for (const prop of Object.getOwnPropertyNames(routeConfig.request.params)) {
+  const paramsShape = routeConfig.request?.params?.shape;
+  if (paramsShape) {
+    for (const prop of Object.getOwnPropertyNames(paramsShape)) {
+      console.log(`express'ing param ${prop} in ${routeConfig.path}`);
       expressPath = expressPath.replace(`{${prop}}`, `:${prop}`);
     }
   }
@@ -123,7 +125,7 @@ export function registerRoute(
 
   let bodySchema: ZodSchema | undefined = undefined;
   const bodyContent = Object.getOwnPropertyNames(
-    routeConfig.request?.body?.content || {}
+    routeConfig.request?.body?.content ?? {}
   );
   if (bodyContent.length > 0) {
     const firstContentType = bodyContent[0];
@@ -141,19 +143,19 @@ export function registerRoute(
   ]);
   switch (routeConfig.method) {
     case "get":
-      expressRoute.get(middleware, routeConfig.handler);
+      expressRoute.get(...middleware, routeConfig.handler);
       break;
     case "patch":
-      expressRoute.patch(middleware, routeConfig.handler);
+      expressRoute.patch(...middleware, routeConfig.handler);
       break;
     case "post":
-      expressRoute.post(middleware, routeConfig.handler);
+      expressRoute.post(...middleware, routeConfig.handler);
       break;
     case "put":
-      expressRoute.put(middleware, routeConfig.handler);
+      expressRoute.put(...middleware, routeConfig.handler);
       break;
     case "delete":
-      expressRoute.delete(middleware, routeConfig.handler);
+      expressRoute.delete(...middleware, routeConfig.handler);
       break;
     default:
       throw new Error(
