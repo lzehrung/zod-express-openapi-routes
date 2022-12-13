@@ -4,6 +4,7 @@
 - Anchor API Zod schemas to DB model interface (using tozod)
 - Validate and parse API request inputs according to Zod schemas (zod-express-middleware)
 - Define API in one place for both express routing, OpenAPI documentation, and request validation (extensions to @asteasolutions/zod-to-openapi)
+- Minimize code duplication (express, openapi, request validation)
 
 ## Key Files
 - API Zod Schemas: [src/products/api-schema.ts](src/products/api-schema.ts)
