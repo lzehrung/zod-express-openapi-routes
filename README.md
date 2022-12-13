@@ -10,6 +10,14 @@
 - Typed API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
 - Helpers that extend @asteasolutions/zod-to-openapi: [src/open-api-helpers.ts](src/open-api-helpers.ts) (these allow reuse of types and route configuration)
 
+## Demo
+
+- clone the repository
+- `npm install`
+- `npm run dev`
+- open the generated OpenAPI docs http://localhost:3000/api-docs
+- get a resource http://localhost:3000/api/products/1
+- use an invalid url segment http://localhost:3000/api/products/abc
 
 Libraries
 
