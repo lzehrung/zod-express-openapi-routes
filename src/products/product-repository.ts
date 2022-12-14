@@ -18,4 +18,8 @@ export class ProductRepository {
   static getProducts(): Product[] {
     return products;
   }
+
+    static create(product: Product) {
+        products.push(product);
+    }
 }

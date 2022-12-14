@@ -4,6 +4,7 @@ import { productsSchema, productSchema, getProductParams } from "./api-schema";
 import { ProductController } from "./product-controller";
 import { Product } from "../db/models";
 import {
+  ApiRouteBody,
   ApiRouteNoInput,
   ApiRouteParams,
   registerRoute,
@@ -60,10 +61,33 @@ const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
   },
 };
 
+const createProductsRoute: ApiRouteBody<typeof productSchema, Product[]> = {
+  path: "/products",
+  method: "post",
+  description: "Create products",
+  handler: ProductController.createProduct,
+  tags: ["products"],
+  middleware: [(req: Request, res: Response, next) => {
+    console.log('example middleware', req.path);
+    next();
+  }],
+  responses: {
+    200: {
+      description: "Product list",
+      content: {
+        "application/json": {
+          schema: productsSchema,
+        },
+      },
+    },
+  },
+};
+
 export function registerProductRoutes(
   registry: OpenAPIRegistry,
   router: Router
 ) {
   registerRoute(getProductsRoute, registry, router);
   registerRoute(getProductRoute, registry, router);
+  registerRoute(createProductsRoute, registry, router);
 }

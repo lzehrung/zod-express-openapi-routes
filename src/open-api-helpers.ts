@@ -19,7 +19,11 @@ import {
   TypedRequestParams,
   TypedRequestQuery
 } from "zod-express-middleware";
-import { ZodRequestBody } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
+import {
+  ZodContentObject,
+  ZodMediaTypeObject,
+  ZodRequestBody
+} from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
 /** Ensure string value is numeric. */
 export const numericString = z.coerce.number();
@@ -47,13 +51,21 @@ export type TypedHandler<TReqVal extends AllReqVal, TResp> = (
   next?: NextFunction
 ) => void;
 
+export interface TypedMediaObject<TBody extends AnyZodObject> extends ZodMediaTypeObject {
+  schema: TBody;
+}
+
+export interface TypedZodContent<TBody extends AnyZodObject> extends ZodContentObject {
+  [mediaType: string]: TypedMediaObject<TBody>;
+}
+
+export interface TypedZodRequestBody<TBody extends AnyZodObject> extends ZodRequestBody {
+  content: TypedZodContent<TBody>
+}
+
 export type ApiRoute<
   TParams extends AnyZodObject | never = AnyZodObject,
-  TBody extends ZodType<any, ZodRequestBody, any> | never = ZodType<
-    any,
-    ZodRequestBody,
-    any
-  >,
+  TBody extends AnyZodObject | never = AnyZodObject,
   TQuery extends AnyZodObject | never = AnyZodObject,
   TResponse = undefined
 > = RouteConfig & {
@@ -74,9 +86,9 @@ export type ApiRouteParams<TParams extends AnyZodObject, TResponse> = ApiRoute<
   TResponse
 >;
 export type ApiRouteBody<
-  TBody extends ZodType<any, ZodRequestBody, any>,
+  TBody extends AnyZodObject,
   TResponse
-> = ApiRoute<any, TBody, any, TResponse>;
+> = ApiRoute<any, AnyZodObject, any, TResponse>;
 export type ApiRouteQuery<TQuery extends AnyZodObject, TResponse> = ApiRoute<
   any,
   any,
@@ -94,7 +106,7 @@ export type ApiRouteNoInput<TResponse> = ApiRoute<
 type TypedRouteConfig =
   | ApiRoute
   | ApiRouteParams<AnyZodObject, any>
-  | ApiRouteBody<ZodType<any, ZodRequestBody, any>, any>
+  | ApiRouteBody<AnyZodObject, any>
   | ApiRouteQuery<AnyZodObject, any>
   | ApiRoute<never, never, never, any>
   | ApiRouteNoInput<any>;
