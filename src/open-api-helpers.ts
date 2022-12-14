@@ -120,7 +120,7 @@ export function registerRoute(
   const paramsShape = routeConfig.request?.params?.shape;
   if (paramsShape) {
     for (const prop of Object.getOwnPropertyNames(paramsShape)) {
-      console.log(`converting {${prop}} in ${routeConfig.path} to :${prop}`);
+      console.debug(`converting {${prop}} in ${routeConfig.path} to :${prop}`);
       expressPath = expressPath.replace(`{${prop}}`, `:${prop}`);
     }
   }
