@@ -61,24 +61,28 @@ const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
   },
 };
 
-const createProductsRoute: ApiRouteBody<typeof productSchema, Product[]> = {
+const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   path: "/products",
   method: "post",
-  description: "Create products",
+  description: "Create product",
   handler: ProductController.createProduct,
   tags: ["products"],
   middleware: [(req: Request, res: Response, next) => {
     console.log('example middleware', req.path);
     next();
   }],
-  responses: {
-    200: {
-      description: "Product list",
+  request: {
+    body: {
       content: {
         "application/json": {
-          schema: productsSchema,
-        },
-      },
+          schema: productSchema
+        }
+      }
+    }
+  },
+  responses: {
+    204: {
+      description: "Product created"
     },
   },
 };

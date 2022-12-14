@@ -71,7 +71,7 @@ export type ApiRoute<
 > = RouteConfig & {
   request?: {
     params?: TParams;
-    body?: TBody;
+    body?: TypedZodRequestBody<TBody>;
     query?: TQuery;
     headers?: ZodType<unknown>[];
   };
