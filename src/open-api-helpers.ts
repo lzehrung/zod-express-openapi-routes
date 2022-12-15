@@ -1,11 +1,5 @@
 import { Router, RequestHandler } from "express";
-import {
-  z,
-  ZodSchema,
-  ZodType,
-  ZodTypeDef,
-  AnyZodObject,
-} from "zod";
+import {z, ZodSchema, ZodType, ZodTypeDef, AnyZodObject } from "zod";
 import {
   extendZodWithOpenApi,
   OpenAPIRegistry,
@@ -17,12 +11,12 @@ import {
   processRequest,
   TypedRequest,
   TypedRequestParams,
-  TypedRequestQuery
+  TypedRequestQuery,
 } from "zod-express-middleware";
 import {
   ZodContentObject,
   ZodMediaTypeObject,
-  ZodRequestBody
+  ZodRequestBody,
 } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
 /** Ensure string value is numeric. */
@@ -35,6 +29,16 @@ export const numericPathParam = numericString.openapi({
     required: true,
   },
 });
+
+// ZodObject<any, any, any, { [x: string]: any; }, { [x: string]: any; }>
+
+export function jsonContent<T extends ZodType<unknown>>(schema: T): TypedZodContent<T> {
+  return {
+    "application/json": {
+      schema
+    }
+  };
+}
 
 export type AllReqVal<
   TParams extends AnyZodObject = AnyZodObject,
@@ -51,16 +55,19 @@ export type TypedHandler<TReqVal extends AllReqVal, TResp> = (
   next?: NextFunction
 ) => void;
 
-export interface TypedMediaObject<TBody extends AnyZodObject> extends ZodMediaTypeObject {
+export interface TypedMediaObject<TBody extends ZodType<unknown>>
+  extends ZodMediaTypeObject {
   schema: TBody;
 }
 
-export interface TypedZodContent<TBody extends AnyZodObject> extends ZodContentObject {
+export interface TypedZodContent<TBody extends ZodType<unknown>>
+  extends ZodContentObject {
   [mediaType: string]: TypedMediaObject<TBody>;
 }
 
-export interface TypedZodRequestBody<TBody extends AnyZodObject> extends ZodRequestBody {
-  content: TypedZodContent<TBody>
+export interface TypedZodRequestBody<TBody extends ZodType<unknown>>
+  extends ZodRequestBody {
+  content: TypedZodContent<TBody>;
 }
 
 export type ApiRoute<
@@ -85,10 +92,12 @@ export type ApiRouteParams<TParams extends AnyZodObject, TResponse> = ApiRoute<
   any,
   TResponse
 >;
-export type ApiRouteBody<
-  TBody extends AnyZodObject,
+export type ApiRouteBody<TBody extends AnyZodObject, TResponse> = ApiRoute<
+  any,
+  AnyZodObject,
+  any,
   TResponse
-> = ApiRoute<any, AnyZodObject, any, TResponse>;
+>;
 export type ApiRouteQuery<TQuery extends AnyZodObject, TResponse> = ApiRoute<
   any,
   any,

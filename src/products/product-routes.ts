@@ -7,6 +7,7 @@ import {
   ApiRouteBody,
   ApiRouteNoInput,
   ApiRouteParams,
+  jsonContent,
   registerRoute,
 } from "../open-api-helpers";
 
@@ -21,18 +22,16 @@ const getProductsRoute: ApiRouteNoInput<Product[]> = {
   description: "Get all products",
   handler: ProductController.getProducts,
   tags: ["products"],
-  middleware: [(req: Request, res: Response, next) => {
-    console.log('example middleware', req.path);
-    next();
-  }],
+  middleware: [
+    (req: Request, res: Response, next) => {
+      console.log("example middleware", req.path);
+      next();
+    },
+  ],
   responses: {
     200: {
       description: "Product list",
-      content: {
-        "application/json": {
-          schema: productsSchema,
-        },
-      },
+      content: jsonContent(productsSchema),
     },
   },
 };
@@ -49,11 +48,7 @@ const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
   responses: {
     200: {
       description: "Product",
-      content: {
-        "application/json": {
-          schema: productSchema,
-        },
-      },
+      content: jsonContent(productSchema),
     },
     404: {
       description: "Product Not Found",
@@ -67,22 +62,20 @@ const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   description: "Create product",
   handler: ProductController.createProduct,
   tags: ["products"],
-  middleware: [(req: Request, res: Response, next) => {
-    console.log('example middleware', req.path);
-    next();
-  }],
+  middleware: [
+    (req: Request, res: Response, next) => {
+      console.log("example middleware", req.path);
+      next();
+    },
+  ],
   request: {
     body: {
-      content: {
-        "application/json": {
-          schema: productSchema
-        }
-      }
-    }
+      content: jsonContent(productSchema),
+    },
   },
   responses: {
     204: {
-      description: "Product created"
+      description: "Product created",
     },
   },
 };
