@@ -18,3 +18,8 @@ export const productsSchema: toZod<Product[]> = z.array(productSchema);
 export const getProductParams = z.object({
   id: numericPathParam,
 });
+
+export const getProductsParams = z.object({
+  name: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+});

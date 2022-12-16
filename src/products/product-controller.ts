@@ -1,8 +1,9 @@
-import { TypedRequestBody, TypedRequestParams } from "zod-express-middleware";
+import { z } from "zod";
+import {TypedRequestBody, TypedRequestParams, TypedRequestQuery} from "zod-express-middleware";
 import { Request, Response } from "express";
 import { Product } from "../db/models";
 import { ProductRepository } from "./product-repository";
-import { getProductParams, productSchema } from "./api-schema";
+import {getProductParams, getProductsParams, productSchema} from "./api-schema";
 
 export class ProductController {
   static getProduct(
@@ -17,8 +18,8 @@ export class ProductController {
     res.status(200).json(product);
   }
 
-  static getProducts(req: Request, res: Response<Product[]>) {
-    const products = ProductRepository.getProducts();
+  static getProducts(req: TypedRequestQuery<typeof getProductsParams>, res: Response<Product[]>) {
+    const products = ProductRepository.getProducts(req.params);
     res.status(200).json(products);
   }
 

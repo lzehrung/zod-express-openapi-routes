@@ -1,12 +1,19 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { Request, Response, Router } from "express";
-import { productsSchema, productSchema, getProductParams } from "./api-schema";
+import {
+  productsSchema,
+  productSchema,
+  getProductParams,
+  getProductsParams,
+} from "./api-schema";
 import { ProductController } from "./product-controller";
 import { Product } from "../db/models";
 import {
+  ApiRoute,
   ApiRouteBody,
   ApiRouteNoInput,
   ApiRouteParams,
+  ApiRouteQuery,
   jsonContent,
   registerRoute,
 } from "../open-api-helpers";
@@ -16,7 +23,7 @@ import {
 // - generate OpenAPI docs
 // - validate the request handler parameter and return types according to zod schema anchored to db model
 
-const getProductsRoute: ApiRouteNoInput<Product[]> = {
+const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product[]> = {
   path: "/products",
   method: "get",
   description: "Get all products",
@@ -28,6 +35,9 @@ const getProductsRoute: ApiRouteNoInput<Product[]> = {
       next();
     },
   ],
+  request: {
+    query: getProductsParams,
+  },
   responses: {
     200: {
       description: "Product list",
