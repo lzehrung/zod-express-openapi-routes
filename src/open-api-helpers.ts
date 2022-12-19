@@ -159,7 +159,12 @@ export function registerRoute(
         `Unsupported HTTP method ${routeConfig.method} for '${routeConfig.method}: ${routeConfig.path}'`
       );
   }
-
-  registry.registerPath(routeConfig);
-  console.log(`registered ${routeConfig.method}: ${expressPath}`);
+  const routeClone = {
+    ...routeConfig
+  };
+  // @ts-ignore
+  delete routeClone.handler;
+  delete routeClone.middleware;
+  registry.registerPath(routeClone);
+  console.log(`registered ${routeClone.method}: ${expressPath}`);
 }

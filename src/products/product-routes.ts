@@ -111,7 +111,7 @@ export const createProductsRoute: ApiRouteBody<typeof product, void> = {
   tags: ["products"],
   middleware: [
     (req: Request, res: Response, next) => {
-      console.log("create product:", JSON.stringify(req.body, null, 2));
+      console.log("create product middleware:", JSON.stringify(req.body, null, 2));
       next();
     },
   ],
