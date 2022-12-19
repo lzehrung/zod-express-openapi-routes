@@ -87,25 +87,25 @@ export interface TypedRouteConfig<
   handler: TypedHandler<TypedRequest<TParams, TQuery, TBody>, TResponse>;
 }
 
-export interface ApiRouteParams<TParams extends AnyZodObject, TResponse>
-  extends TypedRouteConfig<TParams, never, never, TResponse> {}
-export interface ApiRouteBody<TBody extends AnyZodObject, TResponse>
-  extends TypedRouteConfig<never, TBody, never, TResponse> {}
-export interface ApiRouteQuery<TQuery extends AnyZodObject, TResponse>
-  extends TypedRouteConfig<never, never, TQuery, TResponse> {}
+export type ApiRouteParams<TParams extends AnyZodObject, TResponse> = TypedRouteConfig<TParams, never, never, TResponse>;
+export type ApiRouteBody<TBody extends AnyZodObject, TResponse> = TypedRouteConfig<never, TBody, never, TResponse>;
+export type ApiRouteQuery<TQuery extends AnyZodObject, TResponse> = TypedRouteConfig<never, never, TQuery, TResponse>;
+export type ApiRouteResponseOnly<TResponse> = TypedRouteConfig<never, never, never, TResponse>;
 
-export interface ApiRouteResponseOnly<TResponse>
-  extends TypedRouteConfig<never, never, never, TResponse> {}
-
-type RouteTypes =
-  | TypedRouteConfig<any, any, any, any>
-  | ApiRouteParams<any, any>
-  | ApiRouteBody<any, any>
-  | ApiRouteQuery<any, any>
-  | ApiRouteResponseOnly<any>;
+type AnyTypedRoute<
+    TParams extends AnyZodObject | never = AnyZodObject,
+    TBody extends AnyZodObject | never = AnyZodObject,
+    TQuery extends AnyZodObject | never = AnyZodObject,
+    TResponse = undefined
+> =
+    | TypedRouteConfig<TParams, TBody, TQuery, TResponse>
+    | ApiRouteParams<TParams, TResponse>
+    | ApiRouteBody<TBody, TResponse>
+    | ApiRouteQuery<TQuery, TResponse>
+    | ApiRouteResponseOnly<TResponse>;
 
 export function registerRoute(
-  routeConfig: RouteTypes,
+  routeConfig: AnyTypedRoute,
   registry: OpenAPIRegistry,
   router: Router
 ): void {
@@ -153,12 +153,12 @@ export function registerRoute(
         `Unsupported HTTP method ${routeConfig.method} for '${routeConfig.method}: ${routeConfig.path}'`
       );
   }
-  const routeClone = {
-    ...routeConfig
+  // delete properties from extended typed route config that are not part of the OpenAPI spec
+  const routeClone: Partial<TypedRouteConfig> = {
+    ...routeConfig,
+    handler: undefined,
+    middleware: undefined,
   };
-  // @ts-ignore
-  delete routeClone.handler;
-  delete routeClone.middleware;
-  registry.registerPath(routeClone);
+  registry.registerPath(routeClone as TypedRouteConfig);
   console.log(`registered ${routeClone.method}: ${expressPath}`);
 }
