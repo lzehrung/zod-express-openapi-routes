@@ -1,5 +1,5 @@
 import { Router, RequestHandler } from "express";
-import {z, ZodSchema, ZodType, ZodTypeDef, AnyZodObject } from "zod";
+import { z, ZodType, ZodTypeDef, AnyZodObject } from "zod";
 import {
   extendZodWithOpenApi,
   OpenAPIRegistry,
@@ -32,11 +32,13 @@ export const numericPathParam = numericString.openapi({
 
 // ZodObject<any, any, any, { [x: string]: any; }, { [x: string]: any; }>
 
-export function jsonContent<T extends ZodType<unknown>>(schema: T): TypedZodContent<T> {
+export function jsonContent<T extends ZodType<unknown>>(
+  schema: T
+): TypedZodContent<T> {
   return {
     "application/json": {
-      schema
-    }
+      schema,
+    },
   };
 }
 
@@ -70,12 +72,12 @@ export interface TypedZodRequestBody<TBody extends ZodType<unknown>>
   content: TypedZodContent<TBody>;
 }
 
-export type ApiRoute<
+export interface ApiRoute<
   TParams extends AnyZodObject | never = AnyZodObject,
   TBody extends AnyZodObject | never = AnyZodObject,
   TQuery extends AnyZodObject | never = AnyZodObject,
   TResponse = undefined
-> = RouteConfig & {
+> extends RouteConfig {
   request?: {
     params?: TParams;
     body?: TypedZodRequestBody<TBody>;
@@ -83,42 +85,26 @@ export type ApiRoute<
     headers?: ZodType<unknown>[];
   };
   middleware?: RequestHandler[];
-  handler: TypedHandler<TypedRequest<TParams, TBody, TQuery>, TResponse>;
-};
+  handler: TypedHandler<TypedRequest<TParams, TQuery, TBody>, TResponse>;
+}
 
-export type ApiRouteParams<TParams extends AnyZodObject, TResponse> = ApiRoute<
-  TParams,
-  any,
-  any,
-  TResponse
->;
-export type ApiRouteBody<TBody extends AnyZodObject, TResponse> = ApiRoute<
-  any,
-  AnyZodObject,
-  any,
-  TResponse
->;
-export type ApiRouteQuery<TQuery extends AnyZodObject, TResponse> = ApiRoute<
-  any,
-  any,
-  TQuery,
-  TResponse
->;
+export interface ApiRouteParams<TParams extends AnyZodObject, TResponse>
+  extends ApiRoute<TParams, never | any, never | any, TResponse> {}
+export interface ApiRouteBody<TBody extends AnyZodObject, TResponse>
+  extends ApiRoute<never | any, TBody, never | any, TResponse> {}
+export interface ApiRouteQuery<TQuery extends AnyZodObject, TResponse>
+  extends ApiRoute<never | any, never | any, TQuery, TResponse> {}
 
-export type ApiRouteNoInput<TResponse> = ApiRoute<
-  never,
-  never,
-  never,
-  TResponse
->;
+export interface ApiRouteResponseOnly<TResponse>
+  extends ApiRoute<never | any, never | any, never | any, TResponse> {}
 
 type TypedRouteConfig =
   | ApiRoute
-  | ApiRouteParams<AnyZodObject, any>
-  | ApiRouteBody<AnyZodObject, any>
-  | ApiRouteQuery<AnyZodObject, any>
-  | ApiRoute<never, never, never, any>
-  | ApiRouteNoInput<any>;
+  | ApiRoute<never | any, never | any, never | any, never | any>
+  | ApiRouteParams<AnyZodObject, never | any>
+  | ApiRouteBody<AnyZodObject, never | any>
+  | ApiRouteQuery<AnyZodObject, never | any>
+  | ApiRouteResponseOnly<never | any>;
 
 export function registerRoute(
   routeConfig: TypedRouteConfig,
@@ -136,16 +122,10 @@ export function registerRoute(
 
   const expressRoute = router.route(expressPath);
 
-  let bodySchema: ZodSchema | undefined = undefined;
-  const bodyContent = Object.getOwnPropertyNames(
-    routeConfig.request?.body?.content ?? {}
-  );
-  if (bodyContent.length > 0) {
-    const firstContentType = bodyContent[0];
-    bodySchema = (routeConfig.request?.body as ZodRequestBody).content[
-      firstContentType
-    ].schema as ZodSchema;
-  }
+  const bodyContent =
+    Object.getOwnPropertyNames(routeConfig.request?.body?.content ?? {})[0] ??
+    "application/json";
+  const bodySchema = routeConfig.request?.body?.content[bodyContent]?.schema;
   const validationMiddleware = processRequest({
     params: routeConfig.request?.params,
     body: bodySchema,

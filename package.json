@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc -b ./tsconfig.json",
     "start": "node ./dist/server.js",
-    "dev": "node --loader ts-node/esm --inspect .\\src\\server.ts"
+    "dev": "node --loader ts-node/esm --inspect .\\src\\server.ts",
+    "debug": "node --loader ts-node/esm --inspect-brk .\\src\\server.ts"
   },
   "keywords": [],
   "author": "",

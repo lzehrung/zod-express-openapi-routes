@@ -11,9 +11,7 @@ import { Product } from "../db/models";
 import {
   ApiRoute,
   ApiRouteBody,
-  ApiRouteNoInput,
   ApiRouteParams,
-  ApiRouteQuery,
   jsonContent,
   registerRoute,
 } from "../open-api-helpers";
@@ -74,13 +72,14 @@ const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   tags: ["products"],
   middleware: [
     (req: Request, res: Response, next) => {
-      console.log("example middleware", req.path);
+      console.log("create product:", JSON.stringify(req.body, null, 2));
       next();
     },
   ],
   request: {
     body: {
       content: jsonContent(productSchema),
+      required: true,
     },
   },
   responses: {

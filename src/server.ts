@@ -30,7 +30,12 @@ router.use("/swagger.json", (req, res) => {
   res.json(docs);
 });
 
+router.use('/', (req, res) => {
+  res.redirect('/api-docs');
+})
+
 const app = express();
+app.use(express.json());
 app.use(router);
 
 app.listen(3000, () => {
