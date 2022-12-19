@@ -82,6 +82,7 @@ export interface TypedRouteConfig<
   TQuery extends AnyZodObject | never = AnyZodObject,
   TResponse = undefined
 > extends RouteConfig {
+  description: string;
   request?: {
     params?: TParams;
     body?: TypedZodRequestBody<TBody>;

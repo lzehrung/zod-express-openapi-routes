@@ -22,7 +22,7 @@ import {
 // - validate the request handler parameter and return types according to zod schema anchored to db model
 
 // const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product[]> = {
-const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]> = {
+export const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]> = {
   path: "/products",
   method: "get",
   description: "Get all products",
@@ -45,7 +45,7 @@ const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]> = {
   },
 };
 
-const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
+export const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
   path: "/products/{id}",
   method: "get",
   description: "Get a single product",
@@ -65,7 +65,7 @@ const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
   },
 };
 
-const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
+export const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   path: "/products",
   method: "post",
   description: "Create product",
