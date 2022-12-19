@@ -1,8 +1,10 @@
-import { Router, RequestHandler } from "express";
-import { z, ZodType, ZodTypeDef, AnyZodObject } from "zod";
+import assert = require('assert');
+import e, { Router, RequestHandler } from "express";
+import { z, ZodType, ZodTypeDef, AnyZodObject, TypeOf, ZodObject } from "zod";
 import {
   extendZodWithOpenApi,
   OpenAPIRegistry,
+  ResponseConfig,
   RouteConfig,
 } from "@asteasolutions/zod-to-openapi";
 extendZodWithOpenApi(z);
@@ -18,6 +20,8 @@ import {
   ZodMediaTypeObject,
   ZodRequestBody,
 } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
+
+export type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 /** Ensure string value is numeric. */
 export const numericString = z.coerce.number();
@@ -72,7 +76,7 @@ export interface TypedZodRequestBody<TBody extends ZodType<unknown>>
   content: TypedZodContent<TBody>;
 }
 
-export interface ApiRoute<
+export interface TypedRouteConfig<
   TParams extends AnyZodObject | never = AnyZodObject,
   TBody extends AnyZodObject | never = AnyZodObject,
   TQuery extends AnyZodObject | never = AnyZodObject,
@@ -89,24 +93,24 @@ export interface ApiRoute<
 }
 
 export interface ApiRouteParams<TParams extends AnyZodObject, TResponse>
-  extends ApiRoute<TParams, never, never, TResponse> {}
+  extends TypedRouteConfig<TParams, never, never, TResponse> {}
 export interface ApiRouteBody<TBody extends AnyZodObject, TResponse>
-  extends ApiRoute<never, TBody, never, TResponse> {}
+  extends TypedRouteConfig<never, TBody, never, TResponse> {}
 export interface ApiRouteQuery<TQuery extends AnyZodObject, TResponse>
-  extends ApiRoute<never, never, TQuery, TResponse> {}
+  extends TypedRouteConfig<never, never, TQuery, TResponse> {}
 
 export interface ApiRouteResponseOnly<TResponse>
-  extends ApiRoute<never, never, never, TResponse> {}
+  extends TypedRouteConfig<never, never, never, TResponse> {}
 
-type TypedRouteConfig =
-  | ApiRoute<any,any,any,any>
+type RouteTypes =
+  | TypedRouteConfig<any, any, any, any>
   | ApiRouteParams<any, any>
   | ApiRouteBody<any, any>
   | ApiRouteQuery<any, any>
   | ApiRouteResponseOnly<any>;
 
 export function registerRoute(
-  routeConfig: TypedRouteConfig,
+  routeConfig: RouteTypes,
   registry: OpenAPIRegistry,
   router: Router
 ): void {

@@ -9,9 +9,9 @@ import {
 import { ProductController } from "./product-controller";
 import { Product } from "../db/models";
 import {
-  ApiRoute,
   ApiRouteBody,
   ApiRouteParams,
+  ApiRouteQuery,
   jsonContent,
   registerRoute,
 } from "../open-api-helpers";
@@ -21,7 +21,8 @@ import {
 // - generate OpenAPI docs
 // - validate the request handler parameter and return types according to zod schema anchored to db model
 
-const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product[]> = {
+// const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product[]> = {
+const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]> = {
   path: "/products",
   method: "get",
   description: "Get all products",
@@ -38,7 +39,7 @@ const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product
   },
   responses: {
     200: {
-      description: "Product list",
+      description: "Product List",
       content: jsonContent(productsSchema),
     },
   },
@@ -84,7 +85,10 @@ const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   },
   responses: {
     204: {
-      description: "Product created",
+      description: "Created",
+    },
+    500: {
+      description: "Server Error",
     },
   },
 };
