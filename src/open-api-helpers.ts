@@ -44,10 +44,10 @@ export function jsonContent<T extends ZodType<unknown>>(
 
 export type AllReqVal<
   TParams extends AnyZodObject = AnyZodObject,
-  TBody extends ZodType<any, ZodTypeDef, any> = ZodType<any, ZodTypeDef, any>,
+  TBody extends AnyZodObject = AnyZodObject,
   TQuery extends AnyZodObject = AnyZodObject
 > =
-  | TypedRequest<TParams, TBody, TQuery>
+  | TypedRequest<TParams, TQuery, TBody>
   | TypedRequestParams<TParams>
   | TypedRequestQuery<TQuery>;
 
@@ -89,22 +89,21 @@ export interface ApiRoute<
 }
 
 export interface ApiRouteParams<TParams extends AnyZodObject, TResponse>
-  extends ApiRoute<TParams, never | any, never | any, TResponse> {}
+  extends ApiRoute<TParams, never, never, TResponse> {}
 export interface ApiRouteBody<TBody extends AnyZodObject, TResponse>
-  extends ApiRoute<never | any, TBody, never | any, TResponse> {}
+  extends ApiRoute<never, TBody, never, TResponse> {}
 export interface ApiRouteQuery<TQuery extends AnyZodObject, TResponse>
-  extends ApiRoute<never | any, never | any, TQuery, TResponse> {}
+  extends ApiRoute<never, never, TQuery, TResponse> {}
 
 export interface ApiRouteResponseOnly<TResponse>
-  extends ApiRoute<never | any, never | any, never | any, TResponse> {}
+  extends ApiRoute<never, never, never, TResponse> {}
 
 type TypedRouteConfig =
-  | ApiRoute
-  | ApiRoute<never | any, never | any, never | any, never | any>
-  | ApiRouteParams<AnyZodObject, never | any>
-  | ApiRouteBody<AnyZodObject, never | any>
-  | ApiRouteQuery<AnyZodObject, never | any>
-  | ApiRouteResponseOnly<never | any>;
+  | ApiRoute<any,any,any,any>
+  | ApiRouteParams<any, any>
+  | ApiRouteBody<any, any>
+  | ApiRouteQuery<any, any>
+  | ApiRouteResponseOnly<any>;
 
 export function registerRoute(
   routeConfig: TypedRouteConfig,
