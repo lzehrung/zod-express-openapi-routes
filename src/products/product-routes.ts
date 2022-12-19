@@ -65,6 +65,25 @@ export const getProductRoute: ApiRouteParams<typeof idParam, Product> = {
   },
 };
 
+export const patchProductRoute: ApiRouteParams<typeof idParam, Product> = {
+  path: "/products/{id}",
+  method: "patch",
+  description: "Update a single product",
+  request: {
+    params: idParam,
+  },
+  handler: ProductController.getProduct,
+  tags: ["products"],
+  responses: {
+    204: {
+      description: "Updated"
+    },
+    404: {
+      description: "Product Not Found",
+    },
+  },
+};
+
 export const deleteProductRoute: ApiRouteParams<typeof idParam, Product> = {
   path: "/products/{id}",
   method: "delete",
@@ -76,8 +95,7 @@ export const deleteProductRoute: ApiRouteParams<typeof idParam, Product> = {
   tags: ["products"],
   responses: {
     200: {
-      description: "Product",
-      content: jsonContent(product),
+      description: "Deleted"
     },
     404: {
       description: "Product Not Found",
@@ -118,6 +136,8 @@ export function registerProductRoutes(
   router: Router
 ) {
   registerRoute(getProductsRoute, registry, router);
+  registerRoute(patchProductRoute, registry, router);
+  registerRoute(deleteProductRoute, registry, router);
   registerRoute(getProductRoute, registry, router);
   registerRoute(createProductsRoute, registry, router);
 }
