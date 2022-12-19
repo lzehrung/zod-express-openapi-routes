@@ -4,7 +4,7 @@ import { z } from "zod";
 import { numericPathParam } from "../open-api-helpers";
 
 // single product zod schema (checked against the db model interface using toZod)
-export const productSchema: toZod<Product> = z.object({
+export const product: toZod<Product> = z.object({
   id: z.number(),
   name: z.string(),
   price: z.number(),
@@ -12,14 +12,14 @@ export const productSchema: toZod<Product> = z.object({
 });
 
 // list of products schema
-export const productsSchema: toZod<Product[]> = z.array(productSchema);
+export const productList: toZod<Product[]> = z.array(product);
 
 // route parameters for 'Get single product' request
-export const getProductParams = z.object({
+export const idParam = z.object({
   id: numericPathParam,
 });
 
-export const getProductsParams = z.object({
+export const getListParam = z.object({
   name: z.string().optional(),
   categories: z.array(z.string()).optional(),
 });

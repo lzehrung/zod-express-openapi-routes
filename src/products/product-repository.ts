@@ -1,5 +1,5 @@
 import { Product } from "../db/models";
-import { getProductsParams } from "./api-schema";
+import { getListParam } from "./api-schema";
 import { z } from "zod";
 
 const products = new Array<Product>();
@@ -17,7 +17,7 @@ export class ProductRepository {
     return products.find((p) => p.id === id) || null;
   }
 
-  static getProducts(params: z.infer<typeof getProductsParams>): Product[] {
+  static getProducts(params: z.infer<typeof getListParam>): Product[] {
     console.log(params);
     return products.filter((x) => {
       if (params.name) {

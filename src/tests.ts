@@ -3,8 +3,7 @@ import assert from "assert";
 import jsonschema from "jsonschema";
 
 import app from "./server";
-import { productsSchema } from "./products/api-schema";
-import { getProductRoute, getProductsRoute } from "./products/product-routes";
+import { productList } from "./products/api-schema";
 
 (async () => {
   console.log(`Starting tests\r\n\r\n`);
@@ -26,7 +25,7 @@ import { getProductRoute, getProductsRoute } from "./products/product-routes";
     .expect(200)
     .then((res) => {
       assert(
-        productsSchema.safeParse(res.body).success,
+        productList.safeParse(res.body).success,
         "Product List zod schema validation failed0"
       );
     });
