@@ -1,10 +1,10 @@
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { Request, Response, Router } from "express";
 import {
-  productsSchema,
-  productSchema,
-  getProductParams,
-  getProductsParams,
+  productList,
+  product,
+  idParam,
+  getListParam,
 } from "./api-schema";
 import { ProductController } from "./product-controller";
 import { Product } from "../db/models";
@@ -22,7 +22,7 @@ import {
 // - validate the request handler parameter and return types according to zod schema anchored to db model
 
 // const getProductsRoute: ApiRoute<never, never, typeof getProductsParams, Product[]> = {
-export const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]> = {
+export const getProductsRoute: ApiRouteQuery<typeof getListParam, Product[]> = {
   path: "/products",
   method: "get",
   description: "Get all products",
@@ -35,29 +35,29 @@ export const getProductsRoute: ApiRouteQuery<typeof getProductsParams, Product[]
     },
   ],
   request: {
-    query: getProductsParams,
+    query: getListParam,
   },
   responses: {
     200: {
       description: "Product List",
-      content: jsonContent(productsSchema),
+      content: jsonContent(productList),
     },
   },
 };
 
-export const getProductRoute: ApiRouteParams<typeof getProductParams, Product> = {
+export const getProductRoute: ApiRouteParams<typeof idParam, Product> = {
   path: "/products/{id}",
   method: "get",
   description: "Get a single product",
   request: {
-    params: getProductParams,
+    params: idParam,
   },
   handler: ProductController.getProduct,
   tags: ["products"],
   responses: {
     200: {
       description: "Product",
-      content: jsonContent(productSchema),
+      content: jsonContent(product),
     },
     404: {
       description: "Product Not Found",
@@ -65,7 +65,27 @@ export const getProductRoute: ApiRouteParams<typeof getProductParams, Product> =
   },
 };
 
-export const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
+export const deleteProductRoute: ApiRouteParams<typeof idParam, Product> = {
+  path: "/products/{id}",
+  method: "delete",
+  description: "Delete a single product",
+  request: {
+    params: idParam,
+  },
+  handler: ProductController.getProduct,
+  tags: ["products"],
+  responses: {
+    200: {
+      description: "Product",
+      content: jsonContent(product),
+    },
+    404: {
+      description: "Product Not Found",
+    },
+  },
+};
+
+export const createProductsRoute: ApiRouteBody<typeof product, void> = {
   path: "/products",
   method: "post",
   description: "Create product",
@@ -79,7 +99,7 @@ export const createProductsRoute: ApiRouteBody<typeof productSchema, void> = {
   ],
   request: {
     body: {
-      content: jsonContent(productSchema),
+      content: jsonContent(product),
       required: true,
     },
   },
