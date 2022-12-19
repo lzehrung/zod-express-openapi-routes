@@ -1,5 +1,5 @@
 import { Router, RequestHandler } from "express";
-import { z, ZodType, AnyZodObject } from "zod";
+import {z, ZodType, AnyZodObject, ZodTypeDef} from "zod";
 import {
   extendZodWithOpenApi,
   OpenAPIRegistry,
@@ -87,22 +87,39 @@ export interface TypedRouteConfig<
   handler: TypedHandler<TypedRequest<TParams, TQuery, TBody>, TResponse>;
 }
 
-export type ApiRouteParams<TParams extends AnyZodObject, TResponse> = TypedRouteConfig<TParams, never, never, TResponse>;
-export type ApiRouteBody<TBody extends AnyZodObject, TResponse> = TypedRouteConfig<never, TBody, never, TResponse>;
-export type ApiRouteQuery<TQuery extends AnyZodObject, TResponse> = TypedRouteConfig<never, never, TQuery, TResponse>;
-export type ApiRouteResponseOnly<TResponse> = TypedRouteConfig<never, never, never, TResponse>;
+export type ApiRouteParams<
+  TParams extends AnyZodObject,
+  TResponse
+> = TypedRouteConfig<TParams, never, never, TResponse>;
+
+export type ApiRouteBody<
+  TBody extends AnyZodObject,
+  TResponse
+> = TypedRouteConfig<never, TBody, never, TResponse>;
+
+export type ApiRouteQuery<
+  TQuery extends AnyZodObject,
+  TResponse
+> = TypedRouteConfig<never, never, TQuery, TResponse>;
+
+export type ApiRouteResponseOnly<TResponse> = TypedRouteConfig<
+  never,
+  never,
+  never,
+  TResponse
+>;
 
 type AnyTypedRoute<
-    TParams extends AnyZodObject | never = AnyZodObject,
-    TBody extends AnyZodObject | never = AnyZodObject,
-    TQuery extends AnyZodObject | never = AnyZodObject,
-    TResponse = undefined
+  TParams extends AnyZodObject | never = any,
+  TBody extends AnyZodObject | never = any,
+  TQuery extends AnyZodObject | never = any,
+  TResponse extends AnyZodObject | never = any
 > =
-    | TypedRouteConfig<TParams, TBody, TQuery, TResponse>
-    | ApiRouteParams<TParams, TResponse>
-    | ApiRouteBody<TBody, TResponse>
-    | ApiRouteQuery<TQuery, TResponse>
-    | ApiRouteResponseOnly<TResponse>;
+  | TypedRouteConfig<TParams, TBody, TQuery, TResponse>
+  | ApiRouteParams<TParams, TResponse>
+  | ApiRouteBody<TBody, TResponse>
+  | ApiRouteQuery<TQuery, TResponse>
+  | ApiRouteResponseOnly<TResponse>;
 
 export function registerRoute(
   routeConfig: AnyTypedRoute,
