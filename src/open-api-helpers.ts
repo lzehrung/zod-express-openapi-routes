@@ -1,10 +1,8 @@
-import assert = require('assert');
-import e, { Router, RequestHandler } from "express";
-import { z, ZodType, ZodTypeDef, AnyZodObject, TypeOf, ZodObject } from "zod";
+import { Router, RequestHandler } from "express";
+import { z, ZodType, AnyZodObject } from "zod";
 import {
   extendZodWithOpenApi,
   OpenAPIRegistry,
-  ResponseConfig,
   RouteConfig,
 } from "@asteasolutions/zod-to-openapi";
 extendZodWithOpenApi(z);
@@ -21,8 +19,6 @@ import {
   ZodRequestBody,
 } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 
-export type HttpMethod = 'get' | 'post' | 'put' | 'delete' | 'patch';
-
 /** Ensure string value is numeric. */
 export const numericString = z.coerce.number();
 
@@ -33,8 +29,6 @@ export const numericPathParam = numericString.openapi({
     required: true,
   },
 });
-
-// ZodObject<any, any, any, { [x: string]: any; }, { [x: string]: any; }>
 
 export function jsonContent<T extends ZodType<unknown>>(
   schema: T
