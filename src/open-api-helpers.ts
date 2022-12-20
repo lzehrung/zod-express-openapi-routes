@@ -26,7 +26,7 @@ import {
 } from "@asteasolutions/zod-to-openapi/dist/openapi-generator";
 
 export * from "@asteasolutions/zod-to-openapi";
-
+export { toZod } from "tozod";
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 /** Ensure string value is numeric. */
