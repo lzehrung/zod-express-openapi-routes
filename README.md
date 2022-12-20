@@ -1,6 +1,6 @@
 ## Overview
 
-- Very WIP 🚧👷‍♂️
+- WIP 🚧👷‍♂️
 - Anchor API Zod schemas to app interface(s) (using `tozod`)
 - Validate and parse REST request inputs according to Zod schemas (`zod-express-middleware`)
 - Minimize code duplication between express routes, request validation, and OpenAPI definitions (on top of `@asteasolutions/zod-to-openapi`)
