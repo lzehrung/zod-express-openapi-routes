@@ -20,7 +20,6 @@ import {
   ZodRequestBody,
 } from "@asteasolutions/zod-to-openapi/dist/openapi-registry";
 import { toZod } from "tozod";
-import path from "path";
 import {
   OpenAPIObjectConfig,
   OpenApiVersion,
