@@ -30,4 +30,21 @@ export class ProductRepository {
   static create(product: Product) {
     products.push(product);
   }
+
+  static update(id: number, params: Partial<Product | null>) {
+    const product = products.find((p) => p.id === id);
+    if (!product) {
+      return null;
+    }
+    Object.assign(product, params);
+  }
+
+  static delete(id: number): boolean {
+    const index = products.findIndex((p) => p.id === id);
+    if (index === -1) {
+      return false;
+    }
+    products.splice(index, 1);
+    return true;
+  }
 }

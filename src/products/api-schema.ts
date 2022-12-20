@@ -11,6 +11,8 @@ export const product: toZod<Product> = z.object({
   categories: z.array(z.string()).min(1).max(10),
 });
 
+export const updateProduct: toZod<Partial<Product>> = product.partial();
+
 // list of products schema
 export const productList: toZod<Product[]> = z.array(product);
 

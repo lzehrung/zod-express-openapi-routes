@@ -1,4 +1,5 @@
 import {
+  TypedRequest,
   TypedRequestBody,
   TypedRequestParams,
   TypedRequestQuery,
@@ -6,7 +7,7 @@ import {
 import { Response } from "express";
 import { Product } from "../db/models";
 import { ProductRepository } from "./product-repository";
-import { idParam, getListParam, product } from "./api-schema";
+import { idParam, getListParam, product, updateProduct } from "./api-schema";
 
 export class ProductController {
   static getProduct(
@@ -31,7 +32,27 @@ export class ProductController {
 
   static createProduct(req: TypedRequestBody<typeof product>, res: Response) {
     ProductRepository.create(req.body);
+    res.status(201).send();
+  }
+
+  static updateProduct(
+    req: TypedRequest<typeof idParam, never, typeof updateProduct>,
+    res: Response
+  ) {
+    const result = ProductRepository.update(req.params.id, req.body);
+    if (!result) {
+      res.status(404).send();
+      return;
+    }
+    res.status(204).send();
+  }
+
+  static deleteProduct(req: TypedRequestParams<typeof idParam>, res: Response) {
+    const result = ProductRepository.delete(req.params.id);
+    if (!result) {
+      res.status(404).send();
+      return;
+    }
     res.status(204).send();
   }
 }
-

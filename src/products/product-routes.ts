@@ -88,7 +88,7 @@ export const deleteProductRoute: ApiRouteParams<typeof idParam, Product> = {
   handler: ProductController.getProduct,
   tags: ["products"],
   responses: {
-    200: {
+    204: {
       description: "Deleted",
     },
     404: {
@@ -119,8 +119,11 @@ export const createProductsRoute: ApiRouteBody<typeof product, void> = {
     },
   },
   responses: {
-    204: {
+    201: {
       description: "Created",
+    },
+    404: {
+      description: "Product Not Found",
     },
     500: {
       description: "Server Error",
