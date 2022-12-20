@@ -6,10 +6,10 @@
 - Minimize code duplication between express routes, request validation, and OpenAPI definitions (on top of `@asteasolutions/zod-to-openapi`)
 
 ## Highlights
+- Experiments: [src/open-api-helpers.ts](src/open-api-helpers.ts) - facilitate reuse of types and route configuration (including validation) between `zod`, `@asteasolutions/zod-to-openapi`, `zod-express-middleware`, and `express`
 - Sample Zod API Schemas: [src/products/api-schema.ts](src/products/api-schema.ts)
 - Sample (typed) API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
 - Sample controller/express route handlers: [src/products/product-routes.ts](src/products/product-routes.ts)
-- Library: [src/open-api-helpers.ts](src/open-api-helpers.ts) - facilitate reuse of types and route configuration between `@asteasolutions/zod-to-openapi`, `zod-express-middleware`, and `express`
 
 ## Run the example
 
