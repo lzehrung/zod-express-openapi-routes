@@ -217,7 +217,7 @@ function registerRoute(
     middleware: undefined,
   };
   registry.registerPath(routeClone as RouteConfig);
-  console.log(`registered ${routeClone.method}: ${expressPath}`);
+  console.log(`registered route: '${routeClone.method} - ${expressPath}'`);
 }
 
 export function openApiRoutes(options: {
