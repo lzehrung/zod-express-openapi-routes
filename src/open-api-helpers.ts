@@ -220,26 +220,25 @@ function registerRoute(
   console.log(`registered ${routeClone.method}: ${expressPath}`);
 }
 
-export function openApiRoutes(
-  config: {
-    docsPath?: string;
-    swaggerJsonPath?: string;
-    routes: AnyTypedRoute[];
-    version: OpenApiVersion;
-  } & OpenAPIObjectConfig
-): Router {
+export function openApiRoutes(options: {
+  docsPath?: string;
+  swaggerJsonPath?: string;
+  routes: AnyTypedRoute[];
+  version: OpenApiVersion;
+  apiConfig: OpenAPIObjectConfig;
+}): Router {
   const registry = new OpenAPIRegistry();
 
   const router = Router();
-  router.use(config.docsPath ?? "/api-docs", (req, res) => {
+  router.use(options.docsPath ?? "/api-docs", (req, res) => {
     res.send(`
     <!DOCTYPE html>
     <html lang="en">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content="${config.info.title} v${config.info.version}" />
-        <title>${config.info.title} v${config.info.version} Reference</title>
+        <meta name="description" content="${options.apiConfig.info.title} v${options.apiConfig.info.version}" />
+        <title>${options.apiConfig.info.title} v${options.apiConfig.info.version} Reference</title>
         <link
           rel="stylesheet"
           href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css"
@@ -265,13 +264,13 @@ export function openApiRoutes(
     `);
   });
 
-  for (const routeConfig of config.routes) {
+  for (const routeConfig of options.routes) {
     registerRoute(routeConfig, registry, router);
   }
 
-  router.use(config.swaggerJsonPath ?? "/swagger.json", (req, res) => {
-    const docGen = new OpenAPIGenerator(registry.definitions, config.version);
-    const docs = docGen.generateDocument(config);
+  router.use(options.swaggerJsonPath ?? "/swagger.json", (req, res) => {
+    const docGen = new OpenAPIGenerator(registry.definitions, options.version);
+    const docs = docGen.generateDocument(options.apiConfig);
     res.json(docs);
   });
   return router;

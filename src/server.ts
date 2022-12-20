@@ -8,9 +8,11 @@ const router = express.Router();
 
 router.use(
   openApiRoutes({
-    info: {
-      title: "ACME Products API",
-      version: "1.0.0",
+    apiConfig: {
+      info: {
+        title: "ACME Products API",
+        version: "1.0.0",
+      },
     },
     routes: [...productRoutes],
     version: "3.0.0",
