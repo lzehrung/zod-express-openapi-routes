@@ -1,38 +1,25 @@
-import path from 'path';
-import express from "express";
 import { z } from "zod";
-import {
-  extendZodWithOpenApi,
-  OpenAPIGenerator,
-  OpenAPIRegistry,
-} from "@asteasolutions/zod-to-openapi";
+import { openApiRoutes, extendZodWithOpenApi } from "./open-api-helpers";
 extendZodWithOpenApi(z);
-
-import { registerProductRoutes } from "./products/product-routes";
-
-const registry = new OpenAPIRegistry();
+import express from "express";
+import { productRoutes } from "./products/product-routes";
 
 const router = express.Router();
-registerProductRoutes(registry, router);
 
-router.use('/api-docs', (req, res) => {
-  res.sendFile(path.join(__dirname, './templates/api-docs.html'));
-});
-
-router.use("/swagger.json", (req, res) => {
-  const docGen = new OpenAPIGenerator(registry.definitions, "3.0.0");
-  const docs = docGen.generateDocument({
+router.use(
+  openApiRoutes({
     info: {
-      title: "ACME API",
+      title: "ACME Products API",
       version: "1.0.0",
     },
-  });
-  res.json(docs);
-});
+    routes: [...productRoutes],
+    version: "3.0.0",
+  })
+);
 
-router.use('/', (req, res) => {
-  res.redirect('/api-docs');
-})
+router.use("/", (req, res) => {
+  res.redirect("/api-docs");
+});
 
 const app = express();
 app.use(express.json());

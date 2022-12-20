@@ -1,11 +1,5 @@
-import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
-import { Request, Response, Router } from "express";
-import {
-  productList,
-  product,
-  idParam,
-  getListParam,
-} from "./api-schema";
+import { Request, Response } from "express";
+import { productList, product, idParam, getListParam } from "./api-schema";
 import { ProductController } from "./product-controller";
 import { Product } from "../db/models";
 import {
@@ -13,7 +7,7 @@ import {
   ApiRouteParams,
   ApiRouteQuery,
   jsonContent,
-  registerRoute,
+  OpenApiRoutes,
 } from "../open-api-helpers";
 
 // these route definitions are used to:
@@ -76,7 +70,7 @@ export const patchProductRoute: ApiRouteParams<typeof idParam, Product> = {
   tags: ["products"],
   responses: {
     204: {
-      description: "Updated"
+      description: "Updated",
     },
     404: {
       description: "Product Not Found",
@@ -95,7 +89,7 @@ export const deleteProductRoute: ApiRouteParams<typeof idParam, Product> = {
   tags: ["products"],
   responses: {
     200: {
-      description: "Deleted"
+      description: "Deleted",
     },
     404: {
       description: "Product Not Found",
@@ -111,7 +105,10 @@ export const createProductsRoute: ApiRouteBody<typeof product, void> = {
   tags: ["products"],
   middleware: [
     (req: Request, res: Response, next) => {
-      console.log("create product middleware:", JSON.stringify(req.body, null, 2));
+      console.log(
+        "create product middleware:",
+        JSON.stringify(req.body, null, 2)
+      );
       next();
     },
   ],
@@ -131,13 +128,10 @@ export const createProductsRoute: ApiRouteBody<typeof product, void> = {
   },
 };
 
-export function registerProductRoutes(
-  registry: OpenAPIRegistry,
-  router: Router
-) {
-  registerRoute(getProductsRoute, registry, router);
-  registerRoute(patchProductRoute, registry, router);
-  registerRoute(deleteProductRoute, registry, router);
-  registerRoute(getProductRoute, registry, router);
-  registerRoute(createProductsRoute, registry, router);
-}
+export const productRoutes = OpenApiRoutes(
+  getProductsRoute,
+  getProductRoute,
+  createProductsRoute,
+  patchProductRoute,
+  deleteProductRoute
+);

@@ -1,8 +1,12 @@
-import {TypedRequestBody, TypedRequestParams, TypedRequestQuery} from "zod-express-middleware";
-import { Request, Response } from "express";
+import {
+  TypedRequestBody,
+  TypedRequestParams,
+  TypedRequestQuery,
+} from "zod-express-middleware";
+import { Response } from "express";
 import { Product } from "../db/models";
 import { ProductRepository } from "./product-repository";
-import {idParam, getListParam, product} from "./api-schema";
+import { idParam, getListParam, product } from "./api-schema";
 
 export class ProductController {
   static getProduct(
@@ -17,16 +21,17 @@ export class ProductController {
     res.status(200).json(product);
   }
 
-  static getProducts(req: TypedRequestQuery<typeof getListParam>, res: Response<Product[]>) {
+  static getProducts(
+    req: TypedRequestQuery<typeof getListParam>,
+    res: Response<Product[]>
+  ) {
     const products = ProductRepository.getProducts(req.params);
     res.status(200).json(products);
   }
 
-  static createProduct(
-    req: TypedRequestBody<typeof product>,
-    res: Response
-  ) {
+  static createProduct(req: TypedRequestBody<typeof product>, res: Response) {
     ProductRepository.create(req.body);
     res.status(204).send();
   }
 }
+
