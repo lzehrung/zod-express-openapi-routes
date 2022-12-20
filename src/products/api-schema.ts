@@ -20,6 +20,6 @@ export const idParam = z.object({
 });
 
 export const getListParam = z.object({
-  name: z.string().optional(),
-  categories: z.array(z.string()).optional(),
+  name: product.shape.name.optional(),
+  categories: product.shape.categories.optional(),
 });
