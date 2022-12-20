@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router, RequestHandler } from "express";
 import { z, ZodType, AnyZodObject } from "zod";
 import {
@@ -30,10 +31,10 @@ export { toZod } from "tozod";
 export type Method = "get" | "post" | "put" | "delete" | "patch";
 
 /** Ensure string value is numeric. */
-export const numericString = () => z.coerce.number();
+export const numericString = (): z.ZodNumber => z.coerce.number();
 
 /** Ensure url/path segment/param is numeric */
-export const numericPathParam = (name?: string) =>
+export const numericPathParam = (name?: string): z.ZodNumber =>
   numericString().openapi({
     param: {
       name,
@@ -92,7 +93,7 @@ export interface TypedRouteConfig<
   TParams extends AnyZodObject | never = AnyZodObject,
   TBody extends AnyZodObject | never = AnyZodObject,
   TQuery extends AnyZodObject | never = AnyZodObject,
-  TResponse extends any = undefined
+  TResponse = undefined
 > extends RouteConfig {
   description: string;
   request?: {
@@ -114,7 +115,7 @@ export interface TypedRoute<
   TParams extends AnyZodObject | never = AnyZodObject,
   TBody extends AnyZodObject | never = AnyZodObject,
   TQuery extends AnyZodObject | never = AnyZodObject,
-  TResponse extends any = AnyZodObject
+  TResponse = AnyZodObject
 > extends TypedRouteConfig<TParams, TBody, TQuery, TResponse> {
   middleware?: RequestHandler[];
   handler: TypedHandler<TypedRequest<TParams, TQuery, TBody>, TResponse>;
@@ -150,7 +151,7 @@ type AnyTypedRoute<
   TParams extends AnyZodObject | never = any,
   TBody extends AnyZodObject | never = any,
   TQuery extends AnyZodObject | never = any,
-  TResponse extends any = any
+  TResponse = any
 > =
   | TypedRoute<TParams, TBody, TQuery, TResponse>
   | ApiRouteParams<TParams, TResponse>
