@@ -6,9 +6,9 @@ import { numericPathParam } from "../open-api-helpers";
 // single product zod schema (checked against the db model interface using toZod)
 export const product: toZod<Product> = z.object({
   id: z.number(),
-  name: z.string(),
-  price: z.number(),
-  categories: z.array(z.string()),
+  name: z.string().min(1).max(100),
+  price: z.number().min(0.01).max(1000000),
+  categories: z.array(z.string()).min(1).max(10),
 });
 
 // list of products schema
