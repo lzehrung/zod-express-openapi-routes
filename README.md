@@ -1,16 +1,17 @@
 ## Overview
 
 - Very WIP 🚧👷‍♂️
-- Anchor API Zod schemas to DB model interface (using tozod)
-- Validate and parse API request inputs according to Zod schemas (zod-express-middleware)
-- Minimize code duplication between express routes, request validation, and OpenAPI definitions (extensions to @asteasolutions/zod-to-openapi)
+- Anchor API Zod schemas to app interface(s) (using `tozod`)
+- Validate and parse REST request inputs according to Zod schemas (`zod-express-middleware`)
+- Minimize code duplication between express routes, request validation, and OpenAPI definitions (on top of `@asteasolutions/zod-to-openapi`)
 
-## Key Files
-- API Zod Schemas: [src/products/api-schema.ts](src/products/api-schema.ts)
-- Typed API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
-- Helpers that extend @asteasolutions/zod-to-openapi: [src/open-api-helpers.ts](src/open-api-helpers.ts) (these allow reuse of types and route configuration)
+## Highlights
+- Sample Zod API Schemas: [src/products/api-schema.ts](src/products/api-schema.ts)
+- Sample (typed) API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
+- Sample controller/express route handlers: [src/products/product-routes.ts](src/products/product-routes.ts)
+- Library: [src/open-api-helpers.ts](src/open-api-helpers.ts) - facilitate reuse of types and route configuration between `@asteasolutions/zod-to-openapi`, `zod-express-middleware`, and `express`
 
-## Demo
+## Run the example
 
 - clone the repository
 - `npm install`
