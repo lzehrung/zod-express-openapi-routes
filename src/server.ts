@@ -1,7 +1,7 @@
 import { z } from "zod";
 // import { openApiRoutes, extendZodWithOpenApi } from "./open-api-helpers";
 // extendZodWithOpenApi(z);
-import app, { extendZodWithOpenApi, zodOpenApiRoutes } from "./zodios.api";
+import app from "./zodios.api";
 import express from "express";
 // import { productRoutes } from "./products/product-routes";
 
