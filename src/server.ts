@@ -1,29 +1,29 @@
 import { z } from "zod";
-import { openApiRoutes, extendZodWithOpenApi } from "./open-api-helpers";
-extendZodWithOpenApi(z);
+// import { openApiRoutes, extendZodWithOpenApi } from "./open-api-helpers";
+// extendZodWithOpenApi(z);
+import app, { extendZodWithOpenApi, zodOpenApiRoutes } from "./zodios.api";
 import express from "express";
-import { productRoutes } from "./products/product-routes";
+// import { productRoutes } from "./products/product-routes";
 
 const router = express.Router();
-
-router.use(
-  openApiRoutes({
-    apiConfig: {
-      info: {
-        title: "ACME Products API",
-        version: "1.0.0",
-      },
-    },
-    routes: [...productRoutes],
-    version: "3.0.0",
-  })
-);
+//
+// router.use(
+//   zodOpenApiRoutes({
+//     apiConfig: {
+//       info: {
+//         title: "ACME Products API",
+//         version: "1.0.0",
+//       },
+//     },
+//     routes: [...productRoutes],
+//     version: "3.0.0",
+//   })
+// );
 
 router.use("/", (req, res) => {
   res.redirect("/api-docs");
 });
 
-const app = express();
 app.use(express.json());
 app.use(router);
 

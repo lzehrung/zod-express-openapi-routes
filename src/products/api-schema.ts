@@ -18,7 +18,7 @@ export const productList: toZod<Product[]> = z.array(product);
 
 // route parameters for 'Get single product' request
 export const idParam = z.object({
-  id: numericPathParam(),
+  productId: numericPathParam(),
 });
 
 export const getListParam = z.object({
