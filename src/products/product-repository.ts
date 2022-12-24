@@ -38,6 +38,7 @@ export class ProductRepository {
       return null;
     }
     Object.assign(product, params);
+    return product;
   }
 
   static delete(id: number): boolean {

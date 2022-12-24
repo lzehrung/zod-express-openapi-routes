@@ -4,18 +4,22 @@ import { ZodiosRequestHandler } from "@zodios/express";
 import e, { Request, Response } from "express";
 import { Product } from "../db/models";
 import { ProductRepository } from "./product-repository";
-import { idParam, getListParam, product, updateProduct, productList } from "./api-schema";
-import {getProductEndpoint, productsRouter} from "./products-routes";
-
-
+import {
+  idParam,
+  getListParam,
+  product,
+  updateProduct,
+  productList,
+} from "./api-schema";
+import { getProductEndpoint, productsRouter } from "./products-routes";
 
 productsRouter.get("/products/:productId", (req, res) => {
-    const product = ProductRepository.getProduct(req.params.productId);
-    if (!product) {
-        res.status(404).send();
-        return;
-    }
-    res.json(product);
+  const product = ProductRepository.getProduct(req.params.productId);
+  if (!product) {
+    res.status(404).send();
+    return;
+  }
+  res.json(product);
 });
 
 productsRouter.get("/products", (req, res) => {
@@ -29,15 +33,24 @@ productsRouter.post("/products", (req, res) => {
 });
 
 productsRouter.patch("/products/:productId", (req, res) => {
-  ProductRepository.update(req.params.productId, req.body);
+  const result = ProductRepository.update(req.params.productId, req.body);
+  if (!result) {
+    res.status(404).send();
+    return;
+  }
+  res.status(204);
 });
 
 productsRouter.delete("/products/:productId", (req, res) => {
-  ProductRepository.delete(req.params.productId);
+  const result = ProductRepository.delete(req.params.productId);
+  if (!result) {
+    res.status(404).send();
+    return;
+  }
+  res.status(204);
 });
 
 export class ProductController2 {
-
   // static getProducts(
   //   req: TypedRequestQuery<typeof getListParam>,
   //   res: Response<Product[]>
