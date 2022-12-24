@@ -1,28 +1,45 @@
-import { AnyZodObject, z } from "zod";
+import { z } from "zod";
 import {
+  extendZodWithOpenApi,
   OpenAPIGenerator,
   OpenAPIRegistry,
   RouteConfig,
-  extendZodWithOpenApi,
 } from "@asteasolutions/zod-to-openapi";
-extendZodWithOpenApi(z);
-export { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
 import { apiBuilder, ZodiosEndpointDefinition } from "@zodios/core";
 import { zodiosApp } from "@zodios/express";
-import {  product } from "./products/api-schema";
-import { jsonContent, Method } from "./open-api-helpers";
+import { product } from "./products/api-schema";
+import { ApiRouteBody, jsonContent, Method } from "./open-api-helpers";
 import {
   OpenAPIObjectConfig,
   OpenApiVersion,
 } from "@asteasolutions/zod-to-openapi/dist/openapi-generator";
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { ProductController2 } from "./products/product-controller-2";
+import { ZodiosEndpointError } from "@zodios/core/lib/zodios.types";
+
+extendZodWithOpenApi(z);
+export { extendZodWithOpenApi } from "@asteasolutions/zod-to-openapi";
+
+const errorResponseSchema = z.object({
+  code: z.string().optional(),
+  message: z.string().optional(),
+});
+
+const baseApiError: ZodiosEndpointError = {
+  status: "default", // default status code will be used if error is not 404
+  schema: errorResponseSchema,
+};
+
+const notFoundError: ZodiosEndpointError = {
+  status: 404,
+  schema: errorResponseSchema,
+};
 
 export const productApi = apiBuilder({
   method: "get",
   path: "/products/:productId", // auto detect :id and ask for it in apiClient get params
   alias: "getProduct", // optionnal alias to call this endpoint with it
-  description: "Get a product",
+  description: "Get a Product",
   response: product,
   parameters: [
     {
@@ -31,20 +48,24 @@ export const productApi = apiBuilder({
       schema: z.number(),
     },
   ],
-  errors: [
-    {
-      status: 404,
-      schema: z.object({}),
-    },
-    {
-      status: "default", // default status code will be used if error is not 404
-      schema: z.object({
-        code: z.string(),
-        message: z.string(),
-      }),
-    },
-  ],
-}).build();
+  errors: [notFoundError, baseApiError],
+})
+  .addEndpoint({
+    method: "post",
+    path: "/products",
+    description: "Create product",
+    response: product,
+    status: 201,
+    parameters: [
+      {
+        name: "test",
+        type: "Body",
+        schema: product,
+      },
+    ],
+    errors: [baseApiError],
+  })
+  .build();
 
 function openapiJson(endpoint: ZodiosEndpointDefinition): RouteConfig {
   const openapiPath = endpoint.path.replace(/:([^/]+)/g, "{$1}");
@@ -58,22 +79,47 @@ function openapiJson(endpoint: ZodiosEndpointDefinition): RouteConfig {
     ) ?? []
   );
   let params = z.object({});
-  endpoint.parameters?.forEach((param) => {
-    params = params.extend({
-      [param.name]: param.schema,
+  endpoint.parameters
+    ?.filter((x) => x.type === "Path")
+    .forEach((param) => {
+      params = params.extend({
+        [param.name]: param.schema,
+      });
     });
-  });
+  let query = z.object({});
+  endpoint.parameters
+    ?.filter((x) => x.type === "Query")
+    ?.forEach((param) => {
+      query = query.extend({
+        [param.name]: param.schema,
+      });
+    });
+  const bodySchema =
+    endpoint.parameters?.find((x) => x.type === "Body")?.schema ?? z.object({});
+  const body = bodySchema
+    ? {
+        content: {
+          "application/json": {
+            schema: bodySchema,
+          },
+        },
+      }
+    : undefined;
   return {
     method: method,
     path: openapiPath,
     description: endpoint.description ?? `${method} - ${openapiPath}`,
     request: {
       params,
+      headers: endpoint.parameters
+        ?.filter((x) => x.type === "Header")
+        ?.map((param) => param.schema),
+      query,
+      body,
     },
     responses: {
       [successStatus]: {
-        description:
-          endpoint.responseDescription ?? `SUCCESS: ${method} - ${openapiPath}`,
+        description: endpoint.responseDescription ?? `Success Response`,
         content: jsonContent(endpoint.response),
       },
       ...errorResponses,
@@ -90,7 +136,7 @@ export function zodOpenApiRoutes(options: {
 }): Router {
   const registry = new OpenAPIRegistry();
   options.routes.forEach((r) => {
-    console.log(r);
+    // console.log(r);
     registry.registerPath(r);
   });
 
@@ -135,7 +181,8 @@ export function zodOpenApiRoutes(options: {
   router.use(options.swaggerJsonPath ?? "/swagger.json", (req, res) => {
     const docGen = new OpenAPIGenerator(registry.definitions, options.version);
     const docs = docGen.generateDocument(options.apiConfig);
-    res.json(docs);
+    console.log('DOCS', JSON.stringify(docs, null, 2));
+    res.type("application/json").json(docs);
   });
 
   return router;
@@ -155,8 +202,12 @@ app.use(
   })
 );
 
-app.get("/products/:productId", (req, res) => {
-  ProductController2.getProduct(req, res as any);
-});
+app.get("/products/:productId", (req, res) =>
+  ProductController2.getProduct(req as any, res as any)
+);
+
+app.post("/products", (req, res) =>
+  ProductController2.createProduct(req as any, res as any)
+);
 
 export default app;

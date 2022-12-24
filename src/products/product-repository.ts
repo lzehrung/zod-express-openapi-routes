@@ -27,8 +27,9 @@ export class ProductRepository {
     });
   }
 
-  static create(product: Product) {
+  static create(product: Product): Product {
     products.push(product);
+    return product;
   }
 
   static update(id: number, params: Partial<Product | null>) {

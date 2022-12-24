@@ -14,7 +14,7 @@ export class ProductController {
     req: TypedRequestParams<typeof idParam>,
     res: Response<Product>
   ) {
-    const product = ProductRepository.getProduct(req.params.id);
+    const product = ProductRepository.getProduct(req.params.productId);
     if (!product) {
       res.status(404).send();
       return;
@@ -39,7 +39,7 @@ export class ProductController {
     req: TypedRequest<typeof idParam, never, typeof updateProduct>,
     res: Response
   ) {
-    const result = ProductRepository.update(req.params.id, req.body);
+    const result = ProductRepository.update(req.params.productId, req.body);
     if (!result) {
       res.status(404).send();
       return;
@@ -48,7 +48,7 @@ export class ProductController {
   }
 
   static deleteProduct(req: TypedRequestParams<typeof idParam>, res: Response) {
-    const result = ProductRepository.delete(req.params.id);
+    const result = ProductRepository.delete(req.params.productId);
     if (!result) {
       res.status(404).send();
       return;

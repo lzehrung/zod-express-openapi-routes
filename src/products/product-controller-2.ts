@@ -46,9 +46,9 @@ export class ProductController2 {
     res.status(200).json(products);
   }
 
-  static createProduct(req: TypedRequestBody<typeof product>, res: Response) {
-    ProductRepository.create(req.body);
-    res.status(201).send();
+  static createProduct(req: TypedRequestBody<typeof product>, res: Response<z.infer<typeof product>>) {
+    const product = ProductRepository.create(req.body);
+    res.status(201).json(product);
   }
 
   static updateProduct(
