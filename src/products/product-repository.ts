@@ -1,5 +1,5 @@
 import { Product } from "../db/models";
-import { getListParam } from "./api-schema";
+import { getListParam } from "./api-schemas";
 import { z } from "zod";
 
 const products = new Array<Product>();

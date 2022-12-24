@@ -7,7 +7,7 @@
 
 ## Highlights
 - Experiments: [src/open-api-helpers.ts](src/open-api-helpers.ts) - facilitate reuse of types and route configuration (including validation) between `zod`, `@asteasolutions/zod-to-openapi`, `zod-express-middleware`, and `express`
-- Sample Zod API Schemas: [src/products/api-schema.ts](src/products/api-schema.ts)
+- Sample Zod API Schemas: [src/products/api-schemas.ts](src/products/api-schemas.ts)
 - Sample (typed) API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
 - Sample controller/express route handlers: [src/products/product-routes.ts](src/products/product-routes.ts)
 
