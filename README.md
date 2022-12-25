@@ -1,6 +1,7 @@
 ## Overview
 
-- WIP 🚧👷‍♂️ Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI schema at the same time
+- WIP 🚧👷‍♂️
+- Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI schema at the same time
 - Anchor API Zod schemas to app interface(s) (using `tozod`)
 - Validate and parse REST request inputs according to Zod schemas (`@zodios/express`)
 - Minimize code duplication and brittleness between express routes, request validation, and OpenAPI definitions
