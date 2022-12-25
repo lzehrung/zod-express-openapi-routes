@@ -2,7 +2,7 @@ import { toZod } from "tozod";
 import { Product } from "../db/models";
 import { z } from "zod";
 
-// single product zod schema (checked against the db model interface using toZod)
+// single product zod schema (checked against the business domain model using toZod)
 export const product: toZod<Product> = z.object({
   id: z.number(),
   name: z.string().min(1).max(100),

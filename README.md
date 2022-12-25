@@ -1,6 +1,6 @@
 ## Overview
 
-- WIP 🚧👷‍♂️
+- WIP 🚧👷‍♂️ Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI schema at the same time
 - Anchor API Zod schemas to app interface(s) (using `tozod`)
 - Validate and parse REST request inputs according to Zod schemas (`@zodios/express`)
 - Minimize code duplication and brittleness between express routes, request validation, and OpenAPI definitions
@@ -9,8 +9,8 @@
 
 - Helpers to adapt existing team code style: [src/open-api-helpers.ts](src/zodios-helpers.ts)
 - Sample zod schemas for business domain objects: [src/products/api-schemas.ts](src/products/api-schemas.ts)
-- Sample typed, type-hinted, and input validated route handlers via `@zodios/express`: [src/products/product-routes.ts](src/products/product-routes.ts)
-- Sample API endpoint + express route definitions via `@zodios/openapi`: [src/products/product-routes.ts](src/products/product-routes.ts)
+- Sample typed, type-hinted, and input validated route handlers via `@zodios/express`: [src/products/products-routes.ts](src/products/products-routes.ts)
+- Sample API endpoint + express route definitions via `@zodios/openapi`: [src/products/products-routes.ts](src/products/products-routes.ts)
 
 ## Run the example
 
