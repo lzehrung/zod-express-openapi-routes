@@ -19,8 +19,8 @@
 - `npm install`
 - `npm run dev`
 - open the generated OpenAPI docs http://localhost:3250/api-docs
-- get a resource http://localhost:3250/api/products/1
-- use an invalid url segment http://localhost:3250/api/products/abc
+- get a resource http://localhost:3250/products/1
+- use an invalid url segment http://localhost:3250/products/abc
 
 Key Dependencies
 
