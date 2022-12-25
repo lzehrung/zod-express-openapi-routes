@@ -9,8 +9,9 @@
 
 - Helpers to adapt existing team code style: [src/open-api-helpers.ts](src/zodios-helpers.ts)
 - Sample zod schemas for business domain objects: [src/products/api-schemas.ts](src/products/api-schemas.ts)
-- Sample typed, type-hinted, and input validated route handlers via `@zodios/express`: [src/products/products-routes.ts](src/products/products-routes.ts)
 - Sample API endpoint + express route definitions via `@zodios/openapi`: [src/products/products-routes.ts](src/products/products-routes.ts)
+- Sample typed, type-hinted, and input validated route handlers via `@zodios/express`: [src/products/products-controller.ts](src/products/products-controller.ts)
+
 
 ## Run the example
 
