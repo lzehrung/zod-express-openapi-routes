@@ -1,30 +1,12 @@
-import { z } from "zod";
-import { openApiRoutes, extendZodWithOpenApi } from "./open-api-helpers";
-extendZodWithOpenApi(z);
-import express from "express";
-import { productRoutes } from "./products/product-routes";
+import { zodiosApiApp } from "./zodios-helpers";
+import productsController from "./products/products-controller";
 
-const router = express.Router();
-
-router.use(
-  openApiRoutes({
-    apiConfig: {
-      info: {
-        title: "ACME Products API",
-        version: "1.0.0",
-      },
-    },
-    routes: [...productRoutes],
-    version: "3.0.0",
-  })
+const app = zodiosApiApp(
+  {
+    title: "ACME Products API",
+    version: "1.0.0",
+  },
+  [productsController]
 );
-
-router.use("/", (req, res) => {
-  res.redirect("/api-docs");
-});
-
-const app = express();
-app.use(express.json());
-app.use(router);
 
 export default app;

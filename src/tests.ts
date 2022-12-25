@@ -3,7 +3,7 @@ import assert from "assert";
 import jsonschema from "jsonschema";
 
 import app from "./server";
-import { productList } from "./products/api-schema";
+import { productList } from "./products/api-schemas";
 
 (async () => {
   console.log(`Starting tests\r\n\r\n`);

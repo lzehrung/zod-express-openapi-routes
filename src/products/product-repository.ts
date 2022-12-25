@@ -1,5 +1,5 @@
 import { Product } from "../db/models";
-import { getListParam } from "./api-schema";
+import { getListParam } from "./api-schemas";
 import { z } from "zod";
 
 const products = new Array<Product>();
@@ -27,8 +27,9 @@ export class ProductRepository {
     });
   }
 
-  static create(product: Product) {
+  static create(product: Product): Product {
     products.push(product);
+    return product;
   }
 
   static update(id: number, params: Partial<Product | null>) {
@@ -37,6 +38,7 @@ export class ProductRepository {
       return null;
     }
     Object.assign(product, params);
+    return product;
   }
 
   static delete(id: number): boolean {
