@@ -1,26 +1,11 @@
 import { z } from "zod";
-import { apiBuilder, ZodiosEndpointError } from "@zodios/core";
-import { numericString } from "../helpers";
+import { apiBuilder } from "@zodios/core";
 import { product, productList } from "./api-schemas";
-
-const errorResponseSchema = z.object({
-  code: z.string().optional(),
-  message: z.string().optional(),
-});
-
-const baseApiError: ZodiosEndpointError = {
-  status: "default", // default status code will be used if error is not 404
-  schema: errorResponseSchema,
-};
-
-const notFoundError: ZodiosEndpointError = {
-  status: 404,
-  schema: errorResponseSchema,
-};
+import { errorResponse, notFoundResponse } from "../zodios-helpers";
 
 export const productsApi = apiBuilder({
   method: "get",
-  path: "/products/:productId", // auto detect :id and ask for it in apiClient get params
+  path: "/products/:productId", // path params are auto-detected and types are generated on the request object
   description: "Get a Product",
   response: product,
   parameters: [
@@ -30,7 +15,7 @@ export const productsApi = apiBuilder({
       schema: z.number(),
     },
   ],
-  errors: [notFoundError, baseApiError],
+  errors: [errorResponse, notFoundResponse],
 })
   .addEndpoint({
     method: "post",
@@ -45,7 +30,7 @@ export const productsApi = apiBuilder({
         schema: product,
       },
     ],
-    errors: [baseApiError],
+    errors: [errorResponse],
   })
   .addEndpoint({
     method: "get",
@@ -64,7 +49,7 @@ export const productsApi = apiBuilder({
         schema: z.array(z.string()).optional(),
       },
     ],
-    errors: [notFoundError, baseApiError],
+    errors: [errorResponse, notFoundResponse],
   })
   .addEndpoint({
     method: "patch",
@@ -84,7 +69,7 @@ export const productsApi = apiBuilder({
         schema: product.partial(),
       },
     ],
-    errors: [notFoundError, baseApiError],
+    errors: [errorResponse, notFoundResponse],
   })
   .addEndpoint({
     method: "delete",
@@ -96,9 +81,9 @@ export const productsApi = apiBuilder({
       {
         type: "Path",
         name: "productId",
-        schema: numericString(),
+        schema: z.number(),
       },
     ],
-    errors: [notFoundError, baseApiError],
+    errors: [errorResponse, notFoundResponse],
   })
   .build();

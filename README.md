@@ -2,14 +2,15 @@
 
 - WIP 🚧👷‍♂️
 - Anchor API Zod schemas to app interface(s) (using `tozod`)
-- Validate and parse REST request inputs according to Zod schemas (`zod-express-middleware`)
-- Minimize code duplication between express routes, request validation, and OpenAPI definitions (on top of `@asteasolutions/zod-to-openapi`)
+- Validate and parse REST request inputs according to Zod schemas (`@zodios/express`)
+- Minimize code duplication and brittleness between express routes, request validation, and OpenAPI definitions
 
 ## Highlights
-- Experiments: [src/open-api-helpers.ts](src/open-api-helpers.ts) - facilitate reuse of types and route configuration (including validation) between `zod`, `@asteasolutions/zod-to-openapi`, `zod-express-middleware`, and `express`
-- Sample Zod API Schemas: [src/products/api-schemas.ts](src/products/api-schemas.ts)
-- Sample (typed) API route definitions: [src/products/product-routes.ts](src/products/product-routes.ts)
-- Sample controller/express route handlers: [src/products/product-routes.ts](src/products/product-routes.ts)
+
+- Helpers to adapt existing team code style: [src/open-api-helpers.ts](src/zodios-helpers.ts)
+- Sample zod schemas for business domain objects: [src/products/api-schemas.ts](src/products/api-schemas.ts)
+- Sample typed, type-hinted, and input validated route handlers via `@zodios/express`: [src/products/product-routes.ts](src/products/product-routes.ts)
+- Sample API endpoint + express route definitions via `@zodios/openapi`: [src/products/product-routes.ts](src/products/product-routes.ts)
 
 ## Run the example
 
@@ -20,9 +21,8 @@
 - get a resource http://localhost:3000/api/products/1
 - use an invalid url segment http://localhost:3000/api/products/abc
 
-Libraries
+Key Dependencies
 
-- [zod-express-middleware](https://www.npmjs.com/package/zod-express-middleware) - use Zod schemas to validate request inputs (route params, body, query string)
-- [@asteasolutions/zod-to-openapi](https://www.npmjs.com/package/@asteasolutions/zod-to-openapi) - use Zod schemas to define OpenAPI schemas
-- [openapi3-ts](https://www.npmjs.com/package/openapi3-ts) - define OpenAPI 3.0.0 schemas in TypeScript (used by `@asteasolutions/zod-to-openapi`)
-- [tozod](https://www.npmjs.com/package/tozod) - validate that a zod schema conforms to a TypeScript interface/type
+- [@zodios/core](http://www.npmjs.com/package/@zodios/core), [@zodios/express](http://www.npmjs.com/package/@zodios/express), [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) - define express routes, validate input, fully type and type-hint request handlers, generate OpenAPI definition of resources
+- [tozod](https://www.npmjs.com/package/tozod) - validate that a zod schema conforms to a TypeScript interface/type; anchor business domain types to API schemas  
+- [openapi3-ts](https://www.npmjs.com/package/openapi3-ts) - define OpenAPI 3.0.0 schemas in TypeScript

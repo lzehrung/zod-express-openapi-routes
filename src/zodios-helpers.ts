@@ -1,4 +1,5 @@
-import { ZodiosEndpointDefinitions } from "@zodios/core";
+import { z } from "zod";
+import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
 import { zodiosApp, ZodiosRouter } from "@zodios/express";
 import { openApiBuilder } from "@zodios/openapi";
 import { serve, setup } from "swagger-ui-express";
@@ -31,3 +32,18 @@ export function zodiosApiApp(
 
   return app;
 }
+
+const baseErrorSchema = z.object({
+  message: z.string().optional(),
+  data: z.unknown().optional(),
+});
+
+export const errorResponse: ZodiosEndpointError = {
+  status: "default", // default status code will be used if error is not 404
+  schema: baseErrorSchema,
+};
+
+export const notFoundResponse: ZodiosEndpointError = {
+  status: 404,
+  schema: baseErrorSchema,
+};

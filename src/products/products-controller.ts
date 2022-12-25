@@ -5,6 +5,7 @@ import { zodiosRouter } from "@zodios/express";
 import { ZodiosController } from "../zodios-helpers";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
+
 productsRouter.get("/products/:productId", (req, res) => {
   const product = ProductRepository.getProduct(req.params.productId);
   if (!product) {
