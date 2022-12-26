@@ -9,4 +9,8 @@ const app = zodiosApiApp(
   [productsController]
 );
 
+app.use((req, res) => {
+    res.redirect("/api-docs");
+});
+
 export default app;

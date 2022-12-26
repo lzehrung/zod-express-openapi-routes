@@ -13,7 +13,11 @@ export class ZodiosController<TApi extends ZodiosEndpointDefinitions> {
 }
 
 export function zodiosApiApp(
-  info: InfoObject,
+  info: InfoObject & {
+    docsTitle?: string;
+    docsPath?: string;
+    schemaPath?: string;
+  },
   controllers: ZodiosController<any>[]
 ) {
   let app = zodiosApp();
@@ -26,9 +30,20 @@ export function zodiosApiApp(
 
   const openApiDocs = apiBuilder.build();
 
-  app.use(`/swagger.json`, (_, res) => res.json(openApiDocs));
-  app.use("/api-docs", serve);
-  app.use("/api-docs", setup(undefined, { swaggerUrl: "/swagger.json" }));
+  const docsPath = info.schemaPath ?? "/api-docs";
+  const schemaPath = info.docsPath ?? "/swagger.json";
+  const docsTitle = info.docsTitle ?? `${info.title} v${info.version}`;
+
+  app.use(schemaPath, (_, res) => res.json(openApiDocs));
+  app.use(docsPath, serve);
+  app.use(
+    docsPath,
+    setup(undefined, {
+      swaggerUrl: schemaPath,
+      customSiteTitle: docsTitle,
+      swaggerOptions: { layout: "BaseLayout" },
+    })
+  );
 
   return app;
 }

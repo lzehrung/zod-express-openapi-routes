@@ -53,7 +53,7 @@ export const productsApi = apiBuilder({
   })
   .addEndpoint({
     method: "patch",
-    path: "/products/:productId", // auto detect :id and ask for it in apiClient get params
+    path: "/products/:productId",
     description: "Update Product",
     status: 204,
     response: z.object({}),
@@ -73,7 +73,7 @@ export const productsApi = apiBuilder({
   })
   .addEndpoint({
     method: "delete",
-    path: "/products/:productId", // auto detect :id and ask for it in apiClient get params
+    path: "/products/:productId",
     description: "Delete Product",
     status: 204,
     response: z.object({}),
