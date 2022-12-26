@@ -18,7 +18,6 @@ export class ProductRepository {
   }
 
   static getProducts(params: z.infer<typeof getListParam>): Product[] {
-    console.log(params);
     return products.filter((x) => {
       if (params.name) {
         return x.name.indexOf(params.name) > -1;
