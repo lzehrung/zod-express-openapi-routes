@@ -2,7 +2,6 @@ import { z, ZodObject } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
 import {
   zodiosApp,
-  zodiosRouter,
   ZodiosApp,
   ZodiosRouter,
 } from "@zodios/express";
