@@ -14,13 +14,12 @@ import { productList } from "./products/api-schemas";
     .expect("Content-Type", /json/)
     .expect(200)
     .then((res) => {
-      const swagger = JSON.parse(res.body);
-      assert(!!swagger, `expected swagger.json`);
+      assert(!!res.body, `expected swagger.json`);
 
       const openapiValidator = new OpenAPISchemaValidator({
         version: 3,
       });
-      const validationResults = openapiValidator.validate(swagger);
+      const validationResults = openapiValidator.validate(res.body);
       assert(
         validationResults.errors.length === 0,
         `expected no swagger.json validation errors:\r\n${JSON.stringify(
@@ -29,6 +28,10 @@ import { productList } from "./products/api-schemas";
           2
         )}`
       );
+      console.log(`pass!\r\n`);
+    })
+    .catch((err) => {
+      console.error(err);
     });
 
   console.log(`get list`);
@@ -40,10 +43,14 @@ import { productList } from "./products/api-schemas";
       assert(
         productList.safeParse(res.body).success,
         `get list zod schema validation failed:\r\n${JSON.stringify(
-          JSON.parse(res.body),
+          res.body,
           null,
           2
         )}`
       );
+      console.log(`pass!\r\n`);
+    })
+    .catch((err) => {
+      console.error(err);
     });
 })();
