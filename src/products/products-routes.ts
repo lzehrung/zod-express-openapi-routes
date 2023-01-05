@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { apiBuilder } from "@zodios/core";
 import { product, productList } from "./api-schemas";
-import { errorResponse, notFoundResponse } from "../zodios-helpers";
+import { apiBuilder, errorResponse, notFoundResponse } from "../zodios-helpers";
 
 export const productsApi = apiBuilder({
   method: "get",

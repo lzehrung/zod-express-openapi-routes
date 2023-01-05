@@ -1,9 +1,15 @@
 import { z } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
-import { zodiosApp, ZodiosRouter } from "@zodios/express";
+import { zodiosApp, zodiosRouter, ZodiosRouter } from "@zodios/express";
 import { openApiBuilder } from "@zodios/openapi";
 import { serve, setup } from "swagger-ui-express";
 import { OpenAPIV3 } from "openapi-types";
+
+export { ZodiosEndpointDefinitions, ZodiosEndpointError } from '@zodios/core';
+export { ZodiosApp, ZodiosRouter } from '@zodios/express';
+export { OpenAPIV3 } from 'openapi-types';
+export { apiBuilder } from '@zodios/core';
+export { zodiosRouter } from '@zodios/express';
 
 export class ZodiosController<TApi extends ZodiosEndpointDefinitions> {
   constructor(

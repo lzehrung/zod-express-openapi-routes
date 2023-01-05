@@ -1,8 +1,7 @@
 import { ProductRepository } from "./product-repository";
 import { productList } from "./api-schemas";
 import { productsApi } from "./products-routes";
-import { zodiosRouter } from "@zodios/express";
-import { ZodiosController } from "../zodios-helpers";
+import { zodiosRouter, ZodiosController } from "../zodios-helpers";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
 
