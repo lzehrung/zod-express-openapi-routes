@@ -10,7 +10,7 @@ const app = zodiosApiApp(
 );
 
 app.use((req, res) => {
-    res.redirect("/api-docs");
+  res.redirect("/api-docs");
 });
 
 export default app;

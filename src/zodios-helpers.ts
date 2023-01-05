@@ -3,7 +3,7 @@ import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
 import { zodiosApp, ZodiosRouter } from "@zodios/express";
 import { openApiBuilder } from "@zodios/openapi";
 import { serve, setup } from "swagger-ui-express";
-import { InfoObject } from "openapi3-ts";
+import { OpenAPIV3 } from "openapi-types";
 
 export class ZodiosController<TApi extends ZodiosEndpointDefinitions> {
   constructor(
@@ -13,7 +13,7 @@ export class ZodiosController<TApi extends ZodiosEndpointDefinitions> {
 }
 
 export function zodiosApiApp(
-  info: InfoObject & {
+  info: OpenAPIV3.InfoObject & {
     docsTitle?: string;
     docsPath?: string;
     schemaPath?: string;
