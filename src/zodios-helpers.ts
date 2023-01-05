@@ -1,37 +1,44 @@
-import { z } from "zod";
+import { z, ZodObject } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
-import { zodiosApp, zodiosRouter, ZodiosRouter } from "@zodios/express";
+import {
+  zodiosApp,
+  zodiosRouter,
+  ZodiosApp,
+  ZodiosRouter,
+} from "@zodios/express";
 import { openApiBuilder } from "@zodios/openapi";
 import { serve, setup } from "swagger-ui-express";
 import { OpenAPIV3 } from "openapi-types";
 
-export { ZodiosEndpointDefinitions, ZodiosEndpointError } from '@zodios/core';
-export { ZodiosApp, ZodiosRouter } from '@zodios/express';
-export { OpenAPIV3 } from 'openapi-types';
-export { apiBuilder } from '@zodios/core';
-export { zodiosRouter } from '@zodios/express';
+export { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
+export { ZodiosApp, ZodiosRouter } from "@zodios/express";
+export { OpenAPIV3 } from "openapi-types";
+export { apiBuilder } from "@zodios/core";
+export { zodiosRouter } from "@zodios/express";
 
-export class ZodiosController<TApi extends ZodiosEndpointDefinitions> {
+export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
   constructor(
     public endpoints: ZodiosEndpointDefinitions,
     public router: ZodiosRouter<TApi, any>
   ) {}
 }
 
-export function zodiosApiApp(
-  info: OpenAPIV3.InfoObject & {
-    docsTitle?: string;
-    docsPath?: string;
-    schemaPath?: string;
-  },
-  controllers: ZodiosController<any>[]
-) {
+export type ApiInfo = OpenAPIV3.InfoObject & {
+  docsTitle?: string;
+  docsPath?: string;
+  schemaPath?: string;
+};
+
+export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
+  info: ApiInfo,
+  controllers: TypedApiController<TApi>[]
+): ZodiosApp<TApi, ZodObject<any>> {
   let app = zodiosApp();
   let apiBuilder = openApiBuilder(info);
 
-  for (const def of controllers) {
-    apiBuilder = apiBuilder.addPublicApi(def.endpoints);
-    app = app.use(def.router);
+  for (const controller of controllers) {
+    apiBuilder = apiBuilder.addPublicApi(controller.endpoints);
+    app = app.use(controller.router);
   }
 
   const openApiDocs = apiBuilder.build();
@@ -51,7 +58,7 @@ export function zodiosApiApp(
     })
   );
 
-  return app;
+  return app as ZodiosApp<TApi, ZodObject<any>>;
 }
 
 const baseErrorSchema = z.object({

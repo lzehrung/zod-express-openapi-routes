@@ -1,7 +1,7 @@
 import { ProductRepository } from "./product-repository";
 import { productList } from "./api-schemas";
 import { productsApi } from "./products-routes";
-import { zodiosRouter, ZodiosController } from "../zodios-helpers";
+import { zodiosRouter, TypedApiController } from "../zodios-helpers";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
 
@@ -42,5 +42,5 @@ productsRouter.delete("/products/:productId", (req, res) => {
   res.status(204);
 });
 
-const controller = new ZodiosController(productsApi, productsRouter);
+const controller = new TypedApiController(productsApi, productsRouter);
 export default controller;
