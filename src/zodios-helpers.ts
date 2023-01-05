@@ -1,10 +1,6 @@
-import { z, ZodObject } from "zod";
+import { AnyZodObject, z } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
-import {
-  zodiosApp,
-  ZodiosApp,
-  ZodiosRouter,
-} from "@zodios/express";
+import { zodiosApp, ZodiosApp, ZodiosRouter } from "@zodios/express";
 import { openApiBuilder } from "@zodios/openapi";
 import { serve, setup } from "swagger-ui-express";
 import { OpenAPIV3 } from "openapi-types";
@@ -18,7 +14,7 @@ export { zodiosRouter } from "@zodios/express";
 export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
   constructor(
     public endpoints: ZodiosEndpointDefinitions,
-    public router: ZodiosRouter<TApi, any>
+    public router: ZodiosRouter<TApi, AnyZodObject>
   ) {}
 }
 
@@ -31,7 +27,7 @@ export type ApiInfo = OpenAPIV3.InfoObject & {
 export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   info: ApiInfo,
   controllers: TypedApiController<TApi>[]
-): ZodiosApp<TApi, ZodObject<any>> {
+): ZodiosApp<TApi, AnyZodObject> {
   let app = zodiosApp();
   let apiBuilder = openApiBuilder(info);
 
@@ -57,7 +53,7 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
     })
   );
 
-  return app as ZodiosApp<TApi, ZodObject<any>>;
+  return app as ZodiosApp<TApi, AnyZodObject>;
 }
 
 const baseErrorSchema = z.object({
