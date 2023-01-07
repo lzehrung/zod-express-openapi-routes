@@ -21,9 +21,15 @@
 - clone the repository
 - `npm install`
 - `npm run dev`
-- open the generated OpenAPI docs http://localhost:3250/api-docs
-- get a resource http://localhost:3250/products/1
-- use an invalid url segment http://localhost:3250/products/abc
+- open the generated OpenAPI docs http://localhost:3250/api/api-docs
+- open the generated `swagger.json` http://localhost:3250/api/swagger.json
+- get a single resource http://localhost:3250/api/products/1
+- an invalid path parameter results in validation errors http://localhost:3250/api/products/abc
+
+## Limitations
+
+- path must be a constant at compile time for zodios path parameter type inference to work; unable to use template literal / string interpolation for path parameters 
+- haven't thought about nested express routes yet
 
 Key Dependencies
 
