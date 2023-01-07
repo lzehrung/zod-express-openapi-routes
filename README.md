@@ -31,7 +31,7 @@
 - path must be a constant at compile time for zodios path parameter type inference to work; unable to use template literals or concatenation for path parameters 
 - haven't thought about nested express routes yet
 
-Key Dependencies
+## Dependencies
 
 - [@zodios/core](http://www.npmjs.com/package/@zodios/core), [@zodios/express](http://www.npmjs.com/package/@zodios/express), [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) -
   define express routes, validate input, fully type and type-hint request handlers, generate OpenAPI definition of
