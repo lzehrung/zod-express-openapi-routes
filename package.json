@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc -b ./tsconfig.json",
-    "start": "node ./dist/main.js",
+    "start": "npm run build && node ./dist/main.js",
     "dev": "node --loader ts-node/esm --inspect=9340 .\\src\\main.ts",
     "debug": "node --loader ts-node/esm --inspect-brk=9340 .\\src\\main.ts",
     "test": "npm run build && node ./dist/tests.js"
