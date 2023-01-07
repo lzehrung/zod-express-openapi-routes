@@ -2,9 +2,12 @@ import { z } from "zod";
 import { product, productList } from "./api-schemas";
 import { apiBuilder, errorResponse, notFoundResponse } from "../zodios-helpers";
 
+export const singleProductRoute = "/api/products/:productId";
+export const allProductsRoute = "/api/products";
+
 export const productsApi = apiBuilder({
   method: "get",
-  path: "/products/:productId", // path params are auto-detected and types are generated on the request object
+  path: singleProductRoute, // path params are auto-detected and types are generated on the request object
   description: "Get a Product",
   response: product,
   parameters: [
@@ -18,7 +21,7 @@ export const productsApi = apiBuilder({
 })
   .addEndpoint({
     method: "post",
-    path: "/products",
+    path: allProductsRoute,
     description: "Create product",
     response: product,
     status: 201,
@@ -33,7 +36,7 @@ export const productsApi = apiBuilder({
   })
   .addEndpoint({
     method: "get",
-    path: "/products",
+    path: allProductsRoute,
     description: "Get Products",
     response: productList,
     parameters: [
@@ -52,7 +55,7 @@ export const productsApi = apiBuilder({
   })
   .addEndpoint({
     method: "patch",
-    path: "/products/:productId",
+    path: singleProductRoute,
     description: "Update Product",
     status: 204,
     response: z.object({}),
@@ -72,7 +75,7 @@ export const productsApi = apiBuilder({
   })
   .addEndpoint({
     method: "delete",
-    path: "/products/:productId",
+    path: singleProductRoute,
     description: "Delete Product",
     status: 204,
     response: z.object({}),

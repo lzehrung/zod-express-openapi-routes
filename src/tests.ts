@@ -10,7 +10,7 @@ import { productList } from "./products/api-schemas";
 
   console.log(`get swagger.json`);
   await request(app)
-    .get("/swagger.json")
+    .get("/api/swagger.json")
     .expect("Content-Type", /json/)
     .expect(200)
     .then((res) => {
@@ -36,7 +36,7 @@ import { productList } from "./products/api-schemas";
 
   console.log(`get list`);
   request(app)
-    .get("/products")
+    .get("/api/products")
     .expect("Content-Type", /json/)
     .expect(200)
     .then((res) => {

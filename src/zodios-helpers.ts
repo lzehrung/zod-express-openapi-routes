@@ -19,9 +19,12 @@ export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
 }
 
 export type ApiInfo = OpenAPIV3.InfoObject & {
+  /** Title of the API docs page. */
   docsTitle?: string;
+  /** Path to the API docs page. */
   docsPath?: string;
-  schemaPath?: string;
+  /** Path to the API swagger.json file. */
+  swaggerPath?: string;
 };
 
 export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
@@ -29,6 +32,12 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   controllers: TypedApiController<TApi>[]
 ): ZodiosApp<TApi, AnyZodObject> {
   let app = zodiosApp();
+  // delete convenience properties so openapi schema is valid
+  const customDocsPath = info.docsPath;
+  delete info.docsPath;
+  const customSchemaPath = info.swaggerPath;
+  delete info.swaggerPath;
+
   let apiBuilder = openApiBuilder(info);
 
   for (const controller of controllers) {
@@ -38,16 +47,16 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
 
   const openApiDocs = apiBuilder.build();
 
-  const docsPath = info.schemaPath ?? "/api-docs";
-  const schemaPath = info.docsPath ?? "/swagger.json";
+  const docsPath = customDocsPath ?? "/api-docs";
+  const swaggerPath = customSchemaPath ?? "/swagger.json";
   const docsTitle = info.docsTitle ?? `${info.title} v${info.version}`;
 
-  app.use(schemaPath, (_, res) => res.json(openApiDocs));
+  app.use(swaggerPath, (_, res) => res.json(openApiDocs));
   app.use(docsPath, serve);
   app.use(
     docsPath,
     setup(undefined, {
-      swaggerUrl: schemaPath,
+      swaggerUrl: swaggerPath,
       customSiteTitle: docsTitle,
       swaggerOptions: { layout: "BaseLayout" },
     })

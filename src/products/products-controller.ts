@@ -1,11 +1,15 @@
 import { ProductRepository } from "./product-repository";
 import { productList } from "./api-schemas";
-import { productsApi } from "./products-routes";
+import {
+  productsApi,
+  singleProductRoute,
+  allProductsRoute,
+} from "./products-routes";
 import { zodiosRouter, TypedApiController } from "../zodios-helpers";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
 
-productsRouter.get("/products/:productId", (req, res) => {
+productsRouter.get(singleProductRoute, (req, res) => {
   const product = ProductRepository.getProduct(req.params.productId);
   if (!product) {
     res.status(404).send();
@@ -14,17 +18,17 @@ productsRouter.get("/products/:productId", (req, res) => {
   res.json(product);
 });
 
-productsRouter.get("/products", (req, res) => {
+productsRouter.get(allProductsRoute, (req, res) => {
   const products = ProductRepository.getProducts(req.query);
   res.json(productList.parse(products));
 });
 
-productsRouter.post("/products", (req, res) => {
+productsRouter.post(allProductsRoute, (req, res) => {
   const product = ProductRepository.create(req.body);
   res.json(product);
 });
 
-productsRouter.patch("/products/:productId", (req, res) => {
+productsRouter.patch(singleProductRoute, (req, res) => {
   const result = ProductRepository.update(req.params.productId, req.body);
   if (!result) {
     res.status(404).send();
@@ -33,7 +37,7 @@ productsRouter.patch("/products/:productId", (req, res) => {
   res.status(204);
 });
 
-productsRouter.delete("/products/:productId", (req, res) => {
+productsRouter.delete(singleProductRoute, (req, res) => {
   const result = ProductRepository.delete(req.params.productId);
   if (!result) {
     res.status(404).send();
