@@ -28,7 +28,7 @@
 
 ## Limitations
 
-- path must be a constant at compile time for zodios path parameter type inference to work; unable to use template literal / string interpolation for path parameters 
+- path must be a constant at compile time for zodios path parameter type inference to work; unable to use template literals or concatenation for path parameters 
 - haven't thought about nested express routes yet
 
 Key Dependencies
