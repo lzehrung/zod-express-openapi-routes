@@ -1,3 +1,4 @@
+import type { Express } from 'express';
 import { AnyZodObject, z } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
 import { zodiosApp, ZodiosApp, ZodiosRouter } from "@zodios/express";
@@ -19,6 +20,8 @@ export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
 }
 
 export type ApiInfo = OpenAPIV3.InfoObject & {
+  /** initial express instance to extend. */
+  expressInstance?: Express;
   /** Title of the API docs page. */
   docsTitle?: string;
   /** Path to the API docs page. */
@@ -31,12 +34,15 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   info: ApiInfo,
   controllers: TypedApiController<TApi>[]
 ): ZodiosApp<TApi, AnyZodObject> {
-  let app = zodiosApp();
   // delete convenience properties so openapi schema is valid
+  const expressInstance = info.expressInstance;
+  delete info.expressInstance;
   const customDocsPath = info.docsPath;
   delete info.docsPath;
   const customSchemaPath = info.swaggerPath;
   delete info.swaggerPath;
+
+  let app = zodiosApp(undefined, { express: expressInstance });
 
   let apiBuilder = openApiBuilder(info);
 

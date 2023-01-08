@@ -4,8 +4,11 @@ import {
   productsApi,
   singleProductRoute,
   allProductsRoute,
+  allProductImagesRoute,
+  singleProductImageRoute,
 } from "./products-routes";
 import { zodiosRouter, TypedApiController } from "../zodios-helpers";
+import { UploadedFile } from "express-fileupload";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
 
@@ -24,12 +27,15 @@ productsRouter.get(allProductsRoute, (req, res) => {
 });
 
 productsRouter.post(allProductsRoute, (req, res) => {
-  const product = ProductRepository.create(req.body);
+  const product = ProductRepository.createProduct(req.body);
   res.json(product);
 });
 
 productsRouter.patch(singleProductRoute, (req, res) => {
-  const result = ProductRepository.update(req.params.productId, req.body);
+  const result = ProductRepository.updateProduct(
+    req.params.productId,
+    req.body
+  );
   if (!result) {
     res.status(404).send();
     return;
@@ -38,12 +44,57 @@ productsRouter.patch(singleProductRoute, (req, res) => {
 });
 
 productsRouter.delete(singleProductRoute, (req, res) => {
-  const result = ProductRepository.delete(req.params.productId);
+  const result = ProductRepository.deleteProduct(req.params.productId);
   if (!result) {
     res.status(404).send();
     return;
   }
   res.status(204);
+});
+
+productsRouter.get(allProductImagesRoute, (req, res) => {
+  const images = ProductRepository.getProductImages(req.params.productId);
+  if (!images || images.size === 0) {
+    res.json([]);
+    return;
+  }
+  const filePaths = Array.from(images).map(
+    ([id, image]) => `/api/products/${req.params.productId}/images/${id}`
+  );
+  res.json(filePaths);
+});
+
+productsRouter.post(allProductImagesRoute, (req, res) => {
+  if (
+    !req.files ||
+    Array.isArray(req.files) ||
+    !req.files.image ||
+    (req.files.image as UploadedFile).mimetype !== "image/jpeg"
+  ) {
+    res.status(400).send();
+    return;
+  }
+  const upload = req.files.image as UploadedFile;
+  const imageId = ProductRepository.createProductImage(
+    req.params.productId,
+    upload.data
+  );
+  return res.status(201).json({
+    id: imageId,
+    imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,
+  });
+});
+
+productsRouter.get(singleProductImageRoute, async (req, res) => {
+  const image = ProductRepository.getProductImage(
+    req.params.productId,
+    req.params.imageId
+  );
+  if (!image) {
+    res.status(404).send();
+    return;
+  }
+  res.type("image/jpeg").send(image);
 });
 
 const controller = new TypedApiController(productsApi, productsRouter);

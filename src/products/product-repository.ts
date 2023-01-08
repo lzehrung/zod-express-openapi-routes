@@ -12,6 +12,8 @@ for (let i = 1; i <= 10; i++) {
   });
 }
 
+const productImages = new Map<number, Map<number, Buffer>>();
+
 export class ProductRepository {
   static getProduct(id: number): Product | null {
     return products.find((p) => p.id === id) || null;
@@ -26,12 +28,12 @@ export class ProductRepository {
     });
   }
 
-  static create(product: Product): Product {
+  static createProduct(product: Product): Product {
     products.push(product);
     return product;
   }
 
-  static update(id: number, params: Partial<Product | null>) {
+  static updateProduct(id: number, params: Partial<Product | null>) {
     const product = products.find((p) => p.id === id);
     if (!product) {
       return null;
@@ -40,12 +42,29 @@ export class ProductRepository {
     return product;
   }
 
-  static delete(id: number): boolean {
+  static deleteProduct(id: number): boolean {
     const index = products.findIndex((p) => p.id === id);
     if (index === -1) {
       return false;
     }
     products.splice(index, 1);
     return true;
+  }
+
+  static getProductImages(productId: number): Map<number, Buffer> | null {
+    return productImages.get(productId) ?? null;
+  }
+
+  static createProductImage(productId: number, file: Buffer): number {
+    const productImageMap =
+      productImages.get(productId) ?? new Map<number, Buffer>();
+    const imageId = productImageMap.size;
+    productImageMap.set(imageId, file);
+    productImages.set(productId, productImageMap);
+    return imageId;
+  }
+
+  static getProductImage(productId: number, imageId: number): Buffer | null {
+    return productImages.get(productId)?.get(imageId) ?? null;
   }
 }
