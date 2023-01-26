@@ -92,30 +92,6 @@ export const productsApi = apiBuilder({
     errors: [errorResponse, notFoundResponse],
   })
   .addEndpoint({
-    method: "post",
-    path: allProductImagesRoute,
-    description: "Upload Product Image",
-    status: 201,
-    response: z.object({
-      id: z.number(),
-      imageUrl: z.string(),
-    }),
-    requestFormat: "form-data",
-    parameters: [
-      {
-        type: "Path",
-        name: "productId",
-        schema: z.number(),
-      },
-      {
-        type: "Body",
-        name: "image",
-        schema: z.unknown(),
-      },
-    ],
-    errors: [errorResponse],
-  })
-  .addEndpoint({
     method: "get",
     path: allProductImagesRoute,
     description: "Get Product Images",
@@ -135,7 +111,7 @@ export const productsApi = apiBuilder({
     path: singleProductImageRoute,
     description: "Get Product Image",
     status: 200,
-    response: z.instanceof(Buffer),
+    response: z.instanceof(Buffer).or(z.array(z.number())),
     parameters: [
       {
         type: "Path",

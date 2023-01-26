@@ -1,4 +1,4 @@
-import type { Express } from 'express';
+import type { Express } from "express";
 import { AnyZodObject, z } from "zod";
 import { ZodiosEndpointDefinitions, ZodiosEndpointError } from "@zodios/core";
 import { zodiosApp, ZodiosApp, ZodiosRouter } from "@zodios/express";
@@ -15,7 +15,8 @@ export { zodiosRouter } from "@zodios/express";
 export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
   constructor(
     public endpoints: ZodiosEndpointDefinitions,
-    public router: ZodiosRouter<TApi, AnyZodObject>
+    public router: ZodiosRouter<TApi, AnyZodObject>,
+    public additionalOpenApiPaths?: Partial<OpenAPIV3.PathsObject<Record<any, any>>>
   ) {}
 }
 
@@ -32,14 +33,17 @@ export type ApiInfo = OpenAPIV3.InfoObject & {
 
 export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   info: ApiInfo,
-  controllers: TypedApiController<TApi>[]
+  controllers: TypedApiController<TApi>[],
+  manualDefinitions?: Partial<OpenAPIV3.PathsObject<any>>
 ): ZodiosApp<TApi, AnyZodObject> {
   // delete convenience properties so openapi schema is valid
-  const expressInstance = info.expressInstance;
+  const {
+    expressInstance,
+    docsPath: customDocsPath,
+    swaggerPath: customSchemaPath,
+  } = info;
   delete info.expressInstance;
-  const customDocsPath = info.docsPath;
   delete info.docsPath;
-  const customSchemaPath = info.swaggerPath;
   delete info.swaggerPath;
 
   let app = zodiosApp(undefined, { express: expressInstance });
@@ -51,7 +55,23 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
     app = app.use(controller.router);
   }
 
-  const openApiDocs = apiBuilder.build();
+  let openApiDocs = apiBuilder.build();
+  const mergedPaths: OpenAPIV3.PathsObject = {
+    ...openApiDocs.paths
+  };
+  for (const controller of controllers.filter(x => x.additionalOpenApiPaths != undefined)) {
+    for (const [path, schema] of Object.entries(controller.additionalOpenApiPaths!)) {
+        mergedPaths[path] = {
+          ...mergedPaths[path],
+          ...schema
+        };
+    }
+  }
+
+  openApiDocs = {
+    ...openApiDocs,
+    paths: mergedPaths
+  };
 
   const docsPath = customDocsPath ?? "/api-docs";
   const swaggerPath = customSchemaPath ?? "/swagger.json";

@@ -12,7 +12,7 @@ for (let i = 1; i <= 10; i++) {
   });
 }
 
-const productImages = new Map<number, Map<number, Buffer>>();
+const productImages = new Map<number, Map<number, string>>();
 
 export class ProductRepository {
   static getProduct(id: number): Product | null {
@@ -51,20 +51,20 @@ export class ProductRepository {
     return true;
   }
 
-  static getProductImages(productId: number): Map<number, Buffer> | null {
+  static getProductImages(productId: number): Map<number, string> | null {
     return productImages.get(productId) ?? null;
   }
 
-  static createProductImage(productId: number, file: Buffer): number {
+  static createProductImage(productId: number, file: string): number {
     const productImageMap =
-      productImages.get(productId) ?? new Map<number, Buffer>();
+      productImages.get(productId) ?? new Map<number, string>();
     const imageId = productImageMap.size;
     productImageMap.set(imageId, file);
     productImages.set(productId, productImageMap);
     return imageId;
   }
 
-  static getProductImage(productId: number, imageId: number): Buffer | null {
+  static getProductImage(productId: number, imageId: number): string | null {
     return productImages.get(productId)?.get(imageId) ?? null;
   }
 }
