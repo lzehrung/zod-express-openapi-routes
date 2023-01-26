@@ -1,6 +1,5 @@
 ## Overview
 
-- WIP 🚧👷‍♂️
 - Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI
   schema at the same time
 - Anchor API Zod schemas to app interface(s) (using `tozod`)
