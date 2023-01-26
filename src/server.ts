@@ -11,7 +11,7 @@ const app = zodiosApiApp(
   [productsController]
 );
 
-app.use((req, res) => {
+app.use("*", (req, res) => {
   res.redirect("/api/reference");
 });
 

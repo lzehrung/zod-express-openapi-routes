@@ -4,8 +4,13 @@ import {
   productsApi,
   singleProductRoute,
   allProductsRoute,
+  allProductImagesRoute,
+  singleProductImageRoute,
 } from "./products-routes";
 import { zodiosRouter, TypedApiController } from "../zodios-helpers";
+import express from "express";
+import multer from "multer";
+import os from "os";
 
 const productsRouter = zodiosRouter(productsApi, { transform: true });
 
@@ -24,12 +29,15 @@ productsRouter.get(allProductsRoute, (req, res) => {
 });
 
 productsRouter.post(allProductsRoute, (req, res) => {
-  const product = ProductRepository.create(req.body);
+  const product = ProductRepository.createProduct(req.body);
   res.json(product);
 });
 
 productsRouter.patch(singleProductRoute, (req, res) => {
-  const result = ProductRepository.update(req.params.productId, req.body);
+  const result = ProductRepository.updateProduct(
+    req.params.productId,
+    req.body
+  );
   if (!result) {
     res.status(404).send();
     return;
@@ -38,7 +46,7 @@ productsRouter.patch(singleProductRoute, (req, res) => {
 });
 
 productsRouter.delete(singleProductRoute, (req, res) => {
-  const result = ProductRepository.delete(req.params.productId);
+  const result = ProductRepository.deleteProduct(req.params.productId);
   if (!result) {
     res.status(404).send();
     return;
@@ -46,5 +54,109 @@ productsRouter.delete(singleProductRoute, (req, res) => {
   res.status(204);
 });
 
-const controller = new TypedApiController(productsApi, productsRouter);
+productsRouter.get(allProductImagesRoute, (req, res) => {
+  const images = ProductRepository.getProductImages(req.params.productId);
+  if (!images || images.size === 0) {
+    res.json([]);
+    return;
+  }
+  const filePaths = Array.from(images).map(
+    ([id, image]) => `/api/products/${req.params.productId}/images/${id}`
+  );
+  res.json(filePaths);
+});
+
+productsRouter.get(singleProductImageRoute, async (req, res) => {
+  const image = ProductRepository.getProductImage(
+    req.params.productId,
+    req.params.imageId
+  );
+  if (!image) {
+    res.status(404).send();
+    return;
+  }
+  res.type("image/png").sendFile(image);
+});
+
+const additionalRoutes = express.Router();
+
+const upload = multer({ dest: os.tmpdir() });
+additionalRoutes.post(
+  "/api/products/:productId/images",
+  upload.single("imageFile"),
+  (req, res, next) => {
+    console.log("uploaded file", req.file);
+    if (!req.file) {
+      res.status(400).send();
+      return;
+    }
+    const imageId = ProductRepository.createProductImage(
+      Number(req.params.productId),
+      req.file.path
+    );
+    res.json({
+      id: imageId,
+      imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,
+    });
+  }
+);
+
+productsRouter.use("/", additionalRoutes);
+
+const controller = new TypedApiController(productsApi, productsRouter, {
+  "/api/products/{productId}/images": {
+    post: {
+      summary: "Upload a product image",
+      description: "Upload a product image",
+      operationId: "uploadProductImage",
+      tags: ["images"],
+      parameters: [
+        {
+          name: "productId",
+          in: "path",
+          description: "Product ID",
+          required: true,
+          schema: {
+            type: "number",
+          },
+        },
+      ],
+      requestBody: {
+        content: {
+          "multipart/form-data": {
+            schema: {
+              type: "object",
+              properties: {
+                imageFile: {
+                  type: "string",
+                  format: "binary",
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        "201": {
+          description: "Product Image",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  id: {
+                    type: "number",
+                  },
+                  imageUrl: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+});
 export default controller;
