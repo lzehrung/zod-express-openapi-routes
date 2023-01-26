@@ -85,7 +85,7 @@ additionalRoutes.post(
   "/api/products/:productId/images",
   upload.single("imageFile"),
   (req, res, next) => {
-    console.log("uploaded file", req.file);
+    console.log("file upload received", req.file);
     if (!req.file) {
       res.status(400).send();
       return;
@@ -94,7 +94,7 @@ additionalRoutes.post(
       Number(req.params.productId),
       req.file.path
     );
-    res.json({
+    res.status(201).json({
       id: imageId,
       imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,
     });
