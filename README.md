@@ -9,12 +9,12 @@
 
 ## Highlights
 
-- Helpers to adapt existing team code style: [src/zodios-helpers.ts]()
-- Sample zod schemas for business domain objects: [src/products/api-schemas.ts]()
+- Helpers to adapt existing team code style: [src/zodios-helpers.ts](src/zodios-helpers.ts)
+- Sample zod schemas for business domain objects: [src/products/api-schemas.ts](src/products/api-schemas.ts)
 - Sample API endpoint + express route definitions
-  via `@zodios/openapi`: [src/products/products-routes.ts]()
+  via `@zodios/openapi`: [src/products/products-routes.ts](src/products/products-routes.ts)
 - Sample typed, type-hinted, and input validated route handlers
-  via `@zodios/express`: [src/products/products-controller.ts]()
+  via `@zodios/express`: [src/products/products-controller.ts](src/products/products-controller.ts)
 
 ## Run the example
 
@@ -28,7 +28,7 @@
 
 ## Limitations
 
-- file upload routes must be documented manually due to @zodios limitation - example using helper to merge manually defined openapi paths: [src/products/products-controller.ts#L107]()
+- file upload routes must be documented manually due to @zodios limitation - example using helper to merge manually defined openapi paths: [src/products/products-controller.ts#L107](src/products/products-controller.ts#L107)
 - path must be a constant at compile time for zodios path parameter type inference to work; unable to use template literals or concatenation for path parameters 
 - haven't thought about nested express routes yet
 
