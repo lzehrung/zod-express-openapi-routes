@@ -58,27 +58,26 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   }
 
   let openApiDocs = apiBuilder.build();
+
+  // merge zodios and additional (manually defined) openapi paths
   const mergedPaths: OpenAPIV3.PathsObject = {
     ...openApiDocs.paths,
-    ...additionalPaths,
   };
-  for (const controller of controllers.filter(
-    (x) => x.additionalOpenApiPaths != undefined
-  )) {
-    for (const [path, schema] of Object.entries(
-      controller.additionalOpenApiPaths!
-    )) {
+  let additionalOpenApiPaths = controllers
+    .filter((x) => !!x.additionalOpenApiPaths)
+    .map((x) => x.additionalOpenApiPaths);
+  if (additionalPaths) {
+    additionalOpenApiPaths = [...additionalOpenApiPaths, additionalPaths];
+  }
+  for (const paths of additionalOpenApiPaths) {
+    for (const [path, schema] of Object.entries(paths!)) {
       mergedPaths[path] = {
         ...mergedPaths[path],
         ...schema,
       };
     }
   }
-
-  openApiDocs = {
-    ...openApiDocs,
-    paths: mergedPaths,
-  };
+  openApiDocs.paths = mergedPaths;
 
   const docsPath = customDocsPath ?? "/api-docs";
   const swaggerPath = customSchemaPath ?? "/swagger.json";
