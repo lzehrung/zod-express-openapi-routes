@@ -16,7 +16,9 @@ export class TypedApiController<TApi extends ZodiosEndpointDefinitions> {
   constructor(
     public endpoints: ZodiosEndpointDefinitions,
     public router: ZodiosRouter<TApi, AnyZodObject>,
-    public additionalOpenApiPaths?: Partial<OpenAPIV3.PathsObject<Record<any, any>>>
+    public additionalOpenApiPaths?: Partial<
+      OpenAPIV3.PathsObject<Record<any, any>>
+    >
   ) {}
 }
 
@@ -34,7 +36,7 @@ export type ApiInfo = OpenAPIV3.InfoObject & {
 export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
   info: ApiInfo,
   controllers: TypedApiController<TApi>[],
-  manualDefinitions?: Partial<OpenAPIV3.PathsObject<any>>
+  additionalPaths?: Partial<OpenAPIV3.PathsObject<any>>
 ): ZodiosApp<TApi, AnyZodObject> {
   // delete convenience properties so openapi schema is valid
   const {
@@ -57,20 +59,25 @@ export function zodiosApiApp<TApi extends ZodiosEndpointDefinitions>(
 
   let openApiDocs = apiBuilder.build();
   const mergedPaths: OpenAPIV3.PathsObject = {
-    ...openApiDocs.paths
+    ...openApiDocs.paths,
+    ...additionalPaths,
   };
-  for (const controller of controllers.filter(x => x.additionalOpenApiPaths != undefined)) {
-    for (const [path, schema] of Object.entries(controller.additionalOpenApiPaths!)) {
-        mergedPaths[path] = {
-          ...mergedPaths[path],
-          ...schema
-        };
+  for (const controller of controllers.filter(
+    (x) => x.additionalOpenApiPaths != undefined
+  )) {
+    for (const [path, schema] of Object.entries(
+      controller.additionalOpenApiPaths!
+    )) {
+      mergedPaths[path] = {
+        ...mergedPaths[path],
+        ...schema,
+      };
     }
   }
 
   openApiDocs = {
     ...openApiDocs,
-    paths: mergedPaths
+    paths: mergedPaths,
   };
 
   const docsPath = customDocsPath ?? "/api-docs";
