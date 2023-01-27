@@ -41,4 +41,4 @@
 - [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) - generate OpenAPI definitions from zodios configurations
 - [tozod](https://www.npmjs.com/package/tozod) - validate that a zod schema conforms to a TypeScript interface/type;
   anchor API schemas to business domain types
-- [openapi3-ts](https://www.npmjs.com/package/openapi3-ts) - define OpenAPI 3.0.0 schemas in TypeScript
+- [openapi-types](https://www.npmjs.com/package/openapi-types) - define OpenAPI 3.0.0 schemas in TypeScript
