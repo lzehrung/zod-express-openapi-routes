@@ -36,9 +36,9 @@
 
 ## Dependencies
 
-- [@zodios/core](http://www.npmjs.com/package/@zodios/core), [@zodios/express](http://www.npmjs.com/package/@zodios/express), [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) -
-  define express routes, validate input, fully type and type-hint request handlers, generate OpenAPI definition of
-  resources
+- [@zodios/core](http://www.npmjs.com/package/@zodios/core) - define express routes using zod schemas and generate an api client usable in the browser
+- [@zodios/express](http://www.npmjs.com/package/@zodios/express) - validate input and fully type and type-hint express request handlers from zod schemas
+- [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) - generate OpenAPI definitions from zodios configurations
 - [tozod](https://www.npmjs.com/package/tozod) - validate that a zod schema conforms to a TypeScript interface/type;
   anchor API schemas to business domain types
 - [openapi3-ts](https://www.npmjs.com/package/openapi3-ts) - define OpenAPI 3.0.0 schemas in TypeScript
