@@ -1,9 +1,6 @@
-import { toZod } from "tozod";
-import { Product } from "../db/models";
 import { z } from "zod";
 
-// single product zod schema (checked against the business domain model using toZod)
-export const product: toZod<Product> = z.object({
+export const product = z.object({
   id: z.number(),
   name: z.string().min(1).max(100),
   price: z.number().min(0.01).max(1000000),
@@ -11,7 +8,7 @@ export const product: toZod<Product> = z.object({
 });
 
 // list of products schema
-export const productList: toZod<Product[]> = z.array(product);
+export const productList = z.array(product);
 
 export const getListParam = z.object({
   name: product.shape.name.optional(),

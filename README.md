@@ -2,7 +2,6 @@
 
 - Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI
   schema at the same time
-- Anchor API Zod schemas to app interface(s) (using `tozod`)
 - Validate and parse HTTP request inputs according to Zod schemas (`@zodios/express`)
 - Minimize code duplication and brittleness between express routes, request validation, and OpenAPI definitions (`@zodios/openapi`)
 
@@ -39,6 +38,4 @@
 - [@zodios/core](http://www.npmjs.com/package/@zodios/core) - define express routes using zod schemas and generate an api client usable in the browser
 - [@zodios/express](http://www.npmjs.com/package/@zodios/express) - validate input and fully type and type-hint express request handlers from zod schemas
 - [@zodios/openapi](http://www.npmjs.com/package/@zodios/openapi) - generate OpenAPI definitions from zodios configurations
-- [tozod](https://www.npmjs.com/package/tozod) - validate that a zod schema conforms to a TypeScript interface/type;
-  anchor API schemas to business domain types
 - [openapi-types](https://www.npmjs.com/package/openapi-types) - define OpenAPI 3.0.0 schemas in TypeScript
