@@ -1,4 +1,4 @@
-import app from "./server";
+import app from './server';
 
 const port = Number(process.argv[2]) || 3250;
 

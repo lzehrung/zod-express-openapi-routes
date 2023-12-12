@@ -1,6 +1,6 @@
-import { Product } from "../db/models";
-import { getListParam } from "./api-schemas";
-import { z } from "zod";
+import { Product } from '../db/models';
+import { getListParam } from './api-schemas';
+import { z } from 'zod';
 
 const products = new Array<Product>();
 for (let i = 1; i <= 10; i++) {
@@ -56,8 +56,7 @@ export class ProductRepository {
   }
 
   static createProductImage(productId: number, file: string): number {
-    const productImageMap =
-      productImages.get(productId) ?? new Map<number, string>();
+    const productImageMap = productImages.get(productId) ?? new Map<number, string>();
     const imageId = productImageMap.size;
     productImageMap.set(imageId, file);
     productImages.set(productId, productImageMap);
