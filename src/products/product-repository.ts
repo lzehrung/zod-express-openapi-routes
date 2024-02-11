@@ -24,6 +24,9 @@ export class ProductRepository {
       if (params.name) {
         return x.name.indexOf(params.name) > -1;
       }
+      if (params.categories) {
+        return params.categories.every((c) => x.categories.indexOf(c) > -1);
+      }
       return true;
     });
   }

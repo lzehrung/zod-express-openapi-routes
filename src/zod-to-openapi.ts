@@ -1,8 +1,9 @@
 import z, { SomeZodObject, ZodSchema, ZodTypeAny } from 'zod';
 import express, { Express, NextFunction, Request, Response, RequestHandler, IRouterMatcher, query } from 'express';
 import { generateSchema } from '@anatine/zod-openapi';
-import { validateRequest } from "./request-validation.middleware";
+import { validateRequest } from './request-validation.middleware';
 import {
+  ContentObject,
   OpenAPIObject,
   ParameterObject,
   PathItemObject,
@@ -15,7 +16,6 @@ import { serve, setup } from 'swagger-ui-express';
 import { TypedRequest } from './request-validation.middleware';
 
 type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
-type Document = any;
 
 export interface RouteConfig<
   TParams extends ZodSchema = ZodSchema,
@@ -26,9 +26,11 @@ export interface RouteConfig<
   path: string;
   params?: TParams;
   query?: TQuery;
-  body?: TBody;
+  body?: TBody | RequestBodyObject;
   description?: string;
   responses: RouteResponses;
+  middleware?: RequestHandler[];
+  tags?: string[];
 }
 
 export interface RouteResponses {
@@ -38,9 +40,6 @@ export interface RouteResponses {
 export class ZodApiController {
   private router = express.Router();
   private openApiPaths: PathsObject = {};
-  // private openApiDoc: any;
-
-  routes: RouteConfig[] = [];
 
   constructor(private defaultResponses: RouteResponses = {}) {}
 
@@ -60,21 +59,22 @@ export class ZodApiController {
     config: RouteConfig<TParams, TQuery, TBody>,
     handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void
   ): ZodApiController {
-    const { method, path, params, query, body, responses } = config;
+    const { method, path, params, query, body, responses, middleware = [] } = config;
 
-    const validate = params != null || query != null || body != null;
+    const validate = params != null || query != null || (body != null && body instanceof ZodSchema);
 
-    const middleware = validate
+    const middlewares = validate
       ? [
+          ...middleware,
           validateRequest({
             params,
             query,
-            body,
+            body: body instanceof ZodSchema ? body : undefined,
           }),
         ]
-      : [];
+      : middleware;
 
-    this.router[method](path, ...middleware, (req, res, next) => {
+    this.router[method](path, ...middlewares, (req, res, next) => {
       try {
         handler(req, res, next);
       } catch (error) {
@@ -82,18 +82,65 @@ export class ZodApiController {
       }
     });
 
-    this.updateOpenApiDoc(path, method, { ...this.defaultResponses, ...responses });
+    this.addToOpenApiDefinition({ ...config, responses: { ...this.defaultResponses, ...responses } });
 
     return this;
   }
 
-  private updateOpenApiDoc(path: string, method: HttpMethods, responses: RouteResponses): ZodApiController {
-    const pathItem: PathItemObject = this.openApiPaths[path] || {};
+  private addToOpenApiDefinition(config: RouteConfig): ZodApiController {
+    const { method, path, params, query, body, responses, description, tags } = config;
+
+    const openApiPath = this.convertToOpenApiPath(path);
+    const pathItem: PathItemObject = this.openApiPaths[openApiPath] || {};
+
+    const parameters = new Array<ParameterObject>();
+    if (params) {
+
+      const paramsSchema = generateSchema(params);
+
+      for (const key in paramsSchema.properties) {
+        const property = paramsSchema.properties[key];
+        parameters.push({
+          in: 'path',
+          name: key,
+          schema: property,
+          required: true,
+        });
+      }
+    }
+    if (query) {
+      parameters.push({
+        in: 'query',
+        name: 'query',
+        schema: generateSchema(query),
+        required: !query.isOptional(),
+      });
+    }
+
+    pathItem[method] = {
+      description,
+      tags,
+      parameters,
+      requestBody: body
+        ? body instanceof ZodSchema
+          ? {
+              content: {
+                ['application/json']: {
+                  schema: generateSchema(body),
+                },
+              },
+              required: !body.isOptional(),
+              description: body.description,
+            }
+          : body
+        : undefined,
+      responses: {},
+    };
 
     Object.entries(responses).forEach(([statusCode, response]) => {
-      pathItem[method] = {
-        responses: {
-          ...pathItem[method]?.responses,
+      if (pathItem[method]?.responses) {
+        pathItem[method]!.responses = {
+          ...(pathItem[method]?.responses ?? {}),
           [statusCode]:
             response instanceof ZodSchema
               ? {
@@ -105,19 +152,20 @@ export class ZodApiController {
                   },
                 }
               : response,
-        },
-      };
+        };
+      }
     });
 
-    this.openApiPaths[path] = pathItem;
-    // this.openApiDoc.paths = this.openApiPaths;
+    this.openApiPaths[openApiPath] = pathItem;
 
     return this;
   }
 
-  // getOpenApiDocument(): Document {
-  //   return this.openApiDoc;
-  // }
+  /** Converts `api/:someParam` to `api/{someParam}` */
+  private convertToOpenApiPath(input: string) {
+    const regex = /\/:([a-zA-Z0-9_]+)(\/|$)/g;
+    return input.replace(regex, '/{$1}$2');
+  }
 }
 
 export function configureOpenApi({
