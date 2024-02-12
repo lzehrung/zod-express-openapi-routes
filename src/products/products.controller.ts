@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {getListParam, product, productIdParams, productImageParams, productList} from './api-schemas';
 import { RouteResponses, ZodApiController } from '../zod-to-openapi';
 import { ResponseObject } from 'openapi3-ts/oas31';
-import { ProductRepository } from './product-repository';
+import { ProductsRepository } from './products.repository';
 import multer from 'multer';
 import os from 'os';
 
@@ -48,7 +48,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const product = ProductRepository.getProducts({ ...req.query });
+      const product = ProductsRepository.getProducts({ ...req.query });
       if (!product) {
         res.status(404).json({ message: 'Product not found', data: req.query }).send();
         return;
@@ -67,7 +67,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const product = ProductRepository.createProduct(req.body);
+      const product = ProductsRepository.createProduct(req.body);
       res.json(product);
     }
   )
@@ -82,7 +82,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const product = ProductRepository.getProduct(req.params.productId);
+      const product = ProductsRepository.getProduct(req.params.productId);
       if (!product) {
         res.status(404).send();
         return;
@@ -102,7 +102,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const result = ProductRepository.updateProduct(req.params.productId, req.body);
+      const result = ProductsRepository.updateProduct(req.params.productId, req.body);
       if (!result) {
         res.status(404).send();
         return;
@@ -121,7 +121,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const result = ProductRepository.deleteProduct(req.params.productId);
+      const result = ProductsRepository.deleteProduct(req.params.productId);
       if (!result) {
         res.status(404).send();
         return;
@@ -138,7 +138,7 @@ export const productController = new ZodApiController(defaultResponses)
       200: z.any(),
     },
   }, (req, res) => {
-    const image = ProductRepository.getProductImage(req.params.productId, req.params.imageId);
+    const image = ProductsRepository.getProductImage(req.params.productId, req.params.imageId);
     if (!image) {
       res.status(404).send();
       return;
@@ -156,7 +156,7 @@ export const productController = new ZodApiController(defaultResponses)
       },
     },
     (req, res) => {
-      const images = ProductRepository.getProductImages(req.params.productId);
+      const images = ProductsRepository.getProductImages(req.params.productId);
       if (!images || images.size === 0) {
         res.json([]);
         return;
@@ -217,7 +217,7 @@ export const productController = new ZodApiController(defaultResponses)
         res.status(400).send();
         return;
       }
-      const imageId = ProductRepository.createProductImage(Number(req.params.productId), req.file.path);
+      const imageId = ProductsRepository.createProductImage(Number(req.params.productId), req.file.path);
       res.status(201).json({
         id: imageId,
         imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,

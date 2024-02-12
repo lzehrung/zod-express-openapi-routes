@@ -88,33 +88,26 @@ export class ZodApiController {
   }
 
   private addToOpenApiDefinition(config: RouteConfig): ZodApiController {
-    const { method, path, params, query, body, responses, description, tags } = config;
+    const {
+      method,
+      path,
+      params,
+      query,
+      body,
+      responses,
+      description,
+      tags
+    } = config;
 
     const openApiPath = this.convertToOpenApiPath(path);
     const pathItem: PathItemObject = this.openApiPaths[openApiPath] || {};
 
     const parameters = new Array<ParameterObject>();
     if (params) {
-
-      const paramsSchema = generateSchema(params);
-
-      for (const key in paramsSchema.properties) {
-        const property = paramsSchema.properties[key];
-        parameters.push({
-          in: 'path',
-          name: key,
-          schema: property,
-          required: true,
-        });
-      }
+      this.addParams('path', params, parameters);
     }
     if (query) {
-      parameters.push({
-        in: 'query',
-        name: 'query',
-        schema: generateSchema(query),
-        required: !query.isOptional(),
-      });
+      this.addParams('query', query, parameters);
     }
 
     pathItem[method] = {
@@ -160,6 +153,24 @@ export class ZodApiController {
 
     return this;
   }
+
+    private addParams(
+        inType: 'path' | 'query',
+        schema: ZodSchema<any>,
+        parameters: ParameterObject[]
+    ): ParameterObject[] {
+        const schemaObject = generateSchema(schema) as SchemaObject;
+        for (const key in schemaObject.properties) {
+        const property = schemaObject.properties[key];
+        parameters.push({
+            in: inType,
+            name: key,
+            schema: property,
+            required: !schema.isOptional(),
+        });
+        }
+        return parameters;
+    }
 
   /** Converts `api/:someParam` to `api/{someParam}` */
   private convertToOpenApiPath(input: string) {

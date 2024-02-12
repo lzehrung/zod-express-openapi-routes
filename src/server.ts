@@ -1,6 +1,6 @@
 import express from 'express';
 import { configureOpenApi } from './zod-to-openapi';
-import { productController } from './products/products-routes';
+import { productController } from './products/products.controller';
 
 const app = configureOpenApi({
   app: express()

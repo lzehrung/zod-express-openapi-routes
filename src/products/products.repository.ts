@@ -14,7 +14,7 @@ for (let i = 1; i <= 10; i++) {
 
 const productImages = new Map<number, Map<number, string>>();
 
-export class ProductRepository {
+export class ProductsRepository {
   static getProduct(id: number): Product | null {
     return products.find((p) => p.id === id) || null;
   }
