@@ -88,16 +88,7 @@ export class ZodApiController {
   }
 
   private addToOpenApiDefinition(config: RouteConfig): ZodApiController {
-    const {
-      method,
-      path,
-      params,
-      query,
-      body,
-      responses,
-      description,
-      tags
-    } = config;
+    const { method, path, params, query, body, responses, description, tags } = config;
 
     const openApiPath = this.convertToOpenApiPath(path);
     const pathItem: PathItemObject = this.openApiPaths[openApiPath] || {};
@@ -154,24 +145,24 @@ export class ZodApiController {
     return this;
   }
 
-    private addParams(
-        inType: 'path' | 'query',
-        schema: ZodSchema<any>,
-        parameters: ParameterObject[]
-    ): ParameterObject[] {
-        const schemaObject = generateSchema(schema) as SchemaObject;
-        for (const key in schemaObject.properties) {
-          const property = schemaObject.properties[key];
-          const required = schemaObject.required?.includes(key) ?? false;
-          parameters.push({
-              in: inType,
-              name: key,
-              schema: property,
-              required
-          });
-        }
-        return parameters;
+  private addParams(
+    inType: 'path' | 'query',
+    schema: ZodSchema<any>,
+    parameters: ParameterObject[]
+  ): ParameterObject[] {
+    const schemaObject = generateSchema(schema) as SchemaObject;
+    for (const key in schemaObject.properties) {
+      const property = schemaObject.properties[key];
+      const required = schemaObject.required?.includes(key) ?? false;
+      parameters.push({
+        in: inType,
+        name: key,
+        schema: property,
+        required,
+      });
     }
+    return parameters;
+  }
 
   /** Converts `api/:someParam` to `api/{someParam}` */
   private convertToOpenApiPath(input: string) {
@@ -243,50 +234,3 @@ export function configureOpenApi({
 
   return app;
 }
-
-// // Function to convert Zod schema for URL/Route params to OpenAPI schema
-// function zodRouteParamsToOpenApi(zodSchema: ZodSchema<any>): ParameterObject[] {
-//   const schema = generateSchema(zodSchema) as SchemaObject;
-//   return Object.keys(schema.properties || {}).map((key) => ({
-//     name: key,
-//     in: 'path',
-//     required: true,
-//     schema: schema.properties![key],
-//   }));
-// }
-//
-// // Function to convert Zod schema for Query params to OpenAPI schema
-// function zodQueryParamsToOpenApi(zodSchema: ZodSchema<any>): ParameterObject[] {
-//   const schema = generateSchema(zodSchema) as SchemaObject;
-//   return Object.keys(schema.properties || {}).map((key) => ({
-//     name: key,
-//     in: 'query',
-//     required: false, // Change as needed
-//     schema: schema.properties![key],
-//   }));
-// }
-//
-// // Function to convert Zod schema for Body params to OpenAPI schema
-// function zodBodyToOpenApi(zodSchema: ZodSchema<any>): RequestBodyObject {
-//   const schema = generateSchema(zodSchema);
-//   return {
-//     content: {
-//       'application/json': {
-//         schema,
-//       },
-//     },
-//   };
-// }
-//
-// // Function to convert Zod schema for Response content to OpenAPI schema
-// function zodResponseToOpenApi(zodSchema: ZodSchema<any>): ResponseObject {
-//   const schema = generateSchema(zodSchema);
-//   return {
-//     description: 'Successful response', // Customize as needed
-//     content: {
-//       'application/json': {
-//         schema,
-//       },
-//     },
-//   };
-// }
