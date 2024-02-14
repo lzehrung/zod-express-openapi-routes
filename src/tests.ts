@@ -4,6 +4,7 @@ import OpenAPISchemaValidator from 'openapi-schema-validator';
 
 import app from './server';
 import { productList } from './products/api-schemas';
+import {SafeParseError} from "zod";
 
 (async () => {
   console.log(`Starting tests\r\n\r\n`);
@@ -36,10 +37,8 @@ import { productList } from './products/api-schemas';
     .expect('Content-Type', /json/)
     .expect(200)
     .then((res) => {
-      assert(
-        productList.safeParse(res.body).success,
-        failMsg(`get list zod schema validation failed`, res.body)
-      );
+      const result = productList.safeParse(res.body);
+      assert(result.success, failMsg(`get list zod schema validation failed`, (result as SafeParseError<unknown>).error));
       console.log(`pass!\r\n`);
     })
     .catch((err) => {

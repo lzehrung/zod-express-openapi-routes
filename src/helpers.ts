@@ -1,6 +1,6 @@
 import z, { ZodEffects, ZodSchema, ZodString, ZodUnion } from 'zod';
 
-export function jsonString<T extends ZodSchema>(schema: T): ZodEffects<ZodString, T["_output"]> {
+export function jsonString<T extends ZodSchema>(schema: T): ZodEffects<ZodString, T['_output']> {
   return z.string().transform((val, ctx) => {
     try {
       const parsed = JSON.parse(val) as z.infer<T>;

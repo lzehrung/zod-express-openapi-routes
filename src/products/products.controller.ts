@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import {getListParam, product, productIdParams, productImageParams, productList} from './api-schemas';
+import { getListParam, product, productIdParams, productImageParams, productList } from './api-schemas';
 import { RouteResponses, ZodApiController } from '../zod-to-openapi';
 import { ResponseObject } from 'openapi3-ts/oas31';
 import { ProductsRepository } from './products.repository';
@@ -129,22 +129,25 @@ export const productController = new ZodApiController(defaultResponses)
       res.status(204);
     }
   )
-  .route({
-    method: 'get',
-    path: singleProductImageRoute,
-    description: 'Get Product Image',
-    params: productImageParams,
-    responses: {
-      200: z.any(),
+  .route(
+    {
+      method: 'get',
+      path: singleProductImageRoute,
+      description: 'Get Product Image',
+      params: productImageParams,
+      responses: {
+        200: z.any(),
+      },
     },
-  }, (req, res) => {
-    const image = ProductsRepository.getProductImage(req.params.productId, req.params.imageId);
-    if (!image) {
-      res.status(404).send();
-      return;
+    (req, res) => {
+      const image = ProductsRepository.getProductImage(req.params.productId, req.params.imageId);
+      if (!image) {
+        res.status(404).send();
+        return;
+      }
+      res.sendFile(image);
     }
-    res.sendFile(image);
-  })
+  )
   .route(
     {
       method: 'get',

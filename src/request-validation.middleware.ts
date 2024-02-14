@@ -9,20 +9,29 @@ interface ParamsDictionary {
 export declare type TypedRequest<
   TParams extends ZodSchema = ZodSchema,
   TQuery extends ZodSchema = ZodSchema,
-  TBody extends ZodSchema = ZodSchema,
+  TBody extends ZodSchema = ZodSchema
 > = Request<z.infer<TParams>, unknown, z.infer<TBody>, z.infer<TQuery>>;
 
-export declare type TypedRequestBody<
-  TBody extends ZodSchema
-> = Request<ParamsDictionary, unknown, z.infer<TBody>, unknown>;
+export declare type TypedRequestBody<TBody extends ZodSchema> = Request<
+  ParamsDictionary,
+  unknown,
+  z.infer<TBody>,
+  unknown
+>;
 
-export declare type TypedRequestParams<
-  TParams extends ZodSchema
-> = Request<z.infer<TParams>, unknown, unknown, unknown>;
+export declare type TypedRequestParams<TParams extends ZodSchema> = Request<
+  z.infer<TParams>,
+  unknown,
+  unknown,
+  unknown
+>;
 
-export declare type TypedRequestQuery<
-  TQuery extends ZodSchema
-> = Request<ParamsDictionary, unknown, unknown, z.infer<TQuery>>;
+export declare type TypedRequestQuery<TQuery extends ZodSchema> = Request<
+  ParamsDictionary,
+  unknown,
+  unknown,
+  z.infer<TQuery>
+>;
 
 export type ErrorListItem = { type: 'Query' | 'Params' | 'Body'; errors: ZodError };
 
@@ -48,7 +57,7 @@ export function validateRequest<
   TBody extends ZodSchema = ZodUnknown
 >(
   schemas: ValidationParams<TParams, TQuery, TBody>,
-  logger = console,
+  logger = console
 ): RequestHandler<z.infer<TParams>, unknown, z.infer<TBody>, z.infer<TQuery>> {
   return async (req, res, next) => {
     try {
