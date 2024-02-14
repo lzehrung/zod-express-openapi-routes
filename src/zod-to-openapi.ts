@@ -161,21 +161,23 @@ export class ZodApiController {
     ): ParameterObject[] {
         const schemaObject = generateSchema(schema) as SchemaObject;
         for (const key in schemaObject.properties) {
-        const property = schemaObject.properties[key];
-        parameters.push({
-            in: inType,
-            name: key,
-            schema: property,
-            required: !schema.isOptional(),
-        });
+          const property = schemaObject.properties[key];
+          const required = schemaObject.required?.includes(key) ?? false;
+          parameters.push({
+              in: inType,
+              name: key,
+              schema: property,
+              required
+          });
         }
         return parameters;
     }
 
   /** Converts `api/:someParam` to `api/{someParam}` */
   private convertToOpenApiPath(input: string) {
-    const regex = /\/:([a-zA-Z0-9_]+)(\/|$)/g;
-    return input.replace(regex, '/{$1}$2');
+    // https://regex101.com/r/6uTvFu/1
+    const regex = /:([A-Za-z0-9\-_.~]+)/g;
+    return input.replace(regex, '{$1}');
   }
 }
 
