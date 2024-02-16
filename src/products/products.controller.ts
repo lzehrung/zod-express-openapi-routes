@@ -1,38 +1,15 @@
 import { z } from 'zod';
 import { getListParam, product, productIdParams, productImageParams, productList } from './api-schemas';
-import { RouteResponses, ZodApiController } from '../zod-to-openapi';
-import { ResponseObject } from 'openapi3-ts/oas31';
 import { ProductsRepository } from './products.repository';
 import multer from 'multer';
 import os from 'os';
+import { ZodApiController } from '../zod-openapi-express-routes/zod-api.controller';
+import { defaultResponses } from '../common/responses';
 
 export const singleProductRoute = '/api/products/:productId';
 export const allProductsRoute = '/api/products';
 export const singleProductImageRoute = '/api/products/:productId/images/:imageId';
 export const allProductImagesRoute = '/api/products/:productId/images';
-
-const errorFormat: ResponseObject = {
-  description: 'Error response',
-  content: {
-    'application/json': {
-      schema: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-          },
-          data: {
-            type: 'object',
-          },
-        },
-      },
-    },
-  },
-};
-
-const defaultResponses: RouteResponses = {
-  404: errorFormat,
-};
 
 const upload = multer({ dest: os.tmpdir() });
 

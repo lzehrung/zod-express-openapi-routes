@@ -1,4 +1,4 @@
-import z, { ZodEffects, ZodSchema, ZodString, ZodUnion } from 'zod';
+import z, { ZodEffects, ZodSchema, ZodString } from 'zod';
 
 export function jsonString<T extends ZodSchema>(schema: T): ZodEffects<ZodString, T['_output']> {
   return z.string().transform((val, ctx) => {

@@ -2,15 +2,15 @@ import request from 'supertest';
 import assert from 'assert';
 import OpenAPISchemaValidator from 'openapi-schema-validator';
 
-import app from './server';
+import server from './server';
 import { productList } from './products/api-schemas';
-import {SafeParseError} from "zod";
+import { SafeParseError } from 'zod';
 
 (async () => {
   console.log(`Starting tests\r\n\r\n`);
 
   console.log(`get swagger.json`);
-  await request(app)
+  await request(server)
     .get('/api/swagger.json')
     .expect('Content-Type', /json/)
     .expect(200)
@@ -32,13 +32,16 @@ import {SafeParseError} from "zod";
     });
 
   console.log(`get list`);
-  request(app)
+  request(server)
     .get('/api/products')
     .expect('Content-Type', /json/)
     .expect(200)
     .then((res) => {
       const result = productList.safeParse(res.body);
-      assert(result.success, failMsg(`get list zod schema validation failed`, (result as SafeParseError<unknown>).error));
+      assert(
+        result.success,
+        failMsg(`get list zod schema validation failed`, (result as SafeParseError<unknown>).error)
+      );
       console.log(`pass!\r\n`);
     })
     .catch((err) => {

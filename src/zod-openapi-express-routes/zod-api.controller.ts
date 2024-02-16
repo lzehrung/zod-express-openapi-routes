@@ -1,10 +1,5 @@
-import z, { SomeZodObject, ZodSchema, ZodTypeAny } from 'zod';
-import express, { Express, NextFunction, Request, Response, RequestHandler, IRouterMatcher, query } from 'express';
-import { generateSchema } from '@anatine/zod-openapi';
-import { validateRequest } from './request-validation.middleware';
+import express, { NextFunction, RequestHandler, Response } from 'express';
 import {
-  ContentObject,
-  OpenAPIObject,
   ParameterObject,
   PathItemObject,
   PathsObject,
@@ -12,31 +7,58 @@ import {
   ResponseObject,
   SchemaObject,
 } from 'openapi3-ts/oas31';
-import { serve, setup } from 'swagger-ui-express';
-import { TypedRequest } from './request-validation.middleware';
+import { SomeZodObject, ZodSchema } from 'zod';
+import { TypedRequest, validateRequest } from './request-validation.middleware';
+import { generateSchema } from '@anatine/zod-openapi';
 
 type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
+/**
+ * Define an express route with Zod-validated request parameters, query, and body.
+ */
 export interface RouteConfig<
   TParams extends ZodSchema = ZodSchema,
   TQuery extends ZodSchema = ZodSchema,
   TBody extends ZodSchema = ZodSchema
 > {
+  /** The HTTP method for the route. */
   method: HttpMethods;
+
+  /** The express route path in the format `/segment/:param`. Used to generate OpenAPI path definition. */
   path: string;
+
+  /** A Zod schema for the request parameters. Used to generate OpenAPI parameter definition. */
   params?: TParams;
+
+  /** A Zod schema for the request query. Used to generate OpenAPI parameter definition. */
   query?: TQuery;
+
+  /** A Zod schema for the request body. Used to generate OpenAPI parameter definition. */
   body?: TBody | RequestBodyObject;
+
+  /** OpenAPI description of the route. */
   description?: string;
+
+  /** Define the responses for the route. */
   responses: RouteResponses;
+
+  /** Middleware to run before the route handler. */
   middleware?: RequestHandler[];
+
+  /** OpenAPI tags for the route. */
   tags?: string[];
 }
 
+/**
+ * Define the responses for a route.
+ */
 export interface RouteResponses {
   [statusCode: number]: ZodSchema | ResponseObject;
 }
 
+/**
+ * A controller that manages express routes and generates OpenAPI paths.
+ */
 export class ZodApiController {
   private router = express.Router();
   private openApiPaths: PathsObject = {};
@@ -51,6 +73,10 @@ export class ZodApiController {
     return this.openApiPaths;
   }
 
+  /**
+   * Define an express route with Zod-validated request parameters, query,
+   * and body and create OpenAPI definitions for it.
+   */
   route<
     TParams extends ZodSchema = ZodSchema,
     TQuery extends ZodSchema = ZodSchema,
@@ -82,12 +108,12 @@ export class ZodApiController {
       }
     });
 
-    this.addToOpenApiDefinition({ ...config, responses: { ...this.defaultResponses, ...responses } });
+    this.addRouteToOpenApi({ ...config, responses: { ...this.defaultResponses, ...responses } });
 
     return this;
   }
 
-  private addToOpenApiDefinition(config: RouteConfig): ZodApiController {
+  private addRouteToOpenApi(config: RouteConfig): ZodApiController {
     const { method, path, params, query, body, responses, description, tags } = config;
 
     const openApiPath = this.convertToOpenApiPath(path);
@@ -170,67 +196,4 @@ export class ZodApiController {
     const regex = /:([A-Za-z0-9\-_.~]+)/g;
     return input.replace(regex, '{$1}');
   }
-}
-
-export function configureOpenApi({
-  app,
-  routers,
-  initialDoc,
-  docInfo,
-}: {
-  app: express.Application;
-  routers: ZodApiController[];
-  initialDoc?: OpenAPIObject;
-  docInfo?: {
-    title?: string;
-    version?: string;
-    docsTitle?: string;
-    path?: string;
-    swaggerPath?: string;
-  };
-}): express.Application {
-  // configure docs
-  const docsPath = docInfo?.path ?? '/api-docs';
-  const swaggerPath = docInfo?.swaggerPath ?? '/swagger.json';
-
-  const title =
-    docInfo?.docsTitle ?? `${docInfo?.title ?? 'API Documentation'} ${docInfo?.version ? `v${docInfo?.version}` : ''}`;
-  const version = docInfo?.version ?? 'N/A';
-
-  const docs = {
-    openapi: '3.0.0',
-    info: {
-      title,
-      version,
-    },
-    paths: {},
-    ...initialDoc,
-  };
-
-  // merge all router paths
-  for (const router of routers) {
-    for (const [path, schema] of Object.entries(router.openApiPathsObject)) {
-      docs.paths[path] = {
-        ...docs.paths[path],
-        ...schema,
-      };
-    }
-  }
-
-  for (const router of routers) {
-    app.use('/', router.expressRouter);
-  }
-
-  app.use(swaggerPath, (_, res) => res.json(docs));
-  app.use(docsPath, serve);
-  app.use(
-    docsPath,
-    setup(undefined, {
-      swaggerUrl: swaggerPath,
-      customSiteTitle: title,
-      swaggerOptions: { layout: 'BaseLayout' },
-    })
-  );
-
-  return app;
 }

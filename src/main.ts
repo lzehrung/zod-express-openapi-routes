@@ -1,7 +1,7 @@
-import app from './server';
+import server from './server';
 
 const port = Number(process.argv[2]) || 3250;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server started http://localhost:${port}`);
 });
