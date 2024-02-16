@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import { configureOpenApi } from './zod-openapi-express-routes/zod-to-openapi';
 import { productController } from './products/products.controller';
 
@@ -16,6 +16,10 @@ const server = configureOpenApi({
     path: '/api/reference',
     swaggerPath: '/api/swagger.json',
   },
-});
+})
+  .use((req, res) => res.redirect('/api/reference'))
+  .use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    res.status(500).json({ message: 'Internal server error', error: err });
+  });
 
 export default server;
