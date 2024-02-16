@@ -11,7 +11,7 @@
     "test": "npm run build && node ./dist/tests.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Luke Zehrung",
   "license": "ISC",
   "dependencies": {
     "@anatine/zod-openapi": "^2.2.1",

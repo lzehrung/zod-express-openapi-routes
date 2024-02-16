@@ -1,9 +1,8 @@
 ## Overview
 
-- Find an ergonomic way (minimize boilerplate and code duplication) to get typed express route handlers and an OpenAPI
+- Find an ergonomic way (minimize boilerplate and code duplication) to get typed, zod-validated express routes and an OpenAPI
   schema at the same time
-- Validate and parse HTTP request inputs according to Zod schemas
-- Minimize code duplication and brittleness between express routes, request validation, and OpenAPI definitions
+- Minimize code duplication and boilerplate between express routes, request parameter validation, and OpenAPI definitions
 
 ## Highlights
 
