@@ -7,7 +7,7 @@ import {
   ResponseObject,
   SchemaObject,
 } from 'openapi3-ts/oas31';
-import { SomeZodObject, ZodSchema } from 'zod';
+import z, { SomeZodObject, ZodNever, ZodNull, ZodSchema, ZodUndefined } from 'zod';
 import { TypedRequest, validateRequest } from './request-validation.middleware';
 import { generateSchema } from '@anatine/zod-openapi';
 
@@ -49,11 +49,13 @@ export interface RouteConfig<
   tags?: string[];
 }
 
+export type RouteResponse = ZodSchema | ResponseObject;
+
 /**
  * Define the responses for a route.
  */
 export interface RouteResponses {
-  [statusCode: number]: ZodSchema | ResponseObject | null;
+  [statusCode: number]: RouteResponse;
 }
 
 export interface ZodApiControllerConfig {
@@ -64,6 +66,13 @@ export interface ZodApiControllerConfig {
   router?: express.Router;
 }
 
+const defaults = {
+  noContent: 'No content',
+  emptyResponses: [z.never()._type, z.void()._type, z.undefined()._type],
+};
+
+const jsonContent = 'application/json';
+
 /**
  * A controller that manages express routes and generates OpenAPI paths.
  */
@@ -72,7 +81,7 @@ export class ZodApiController {
   openApiPaths: PathsObject = {};
   readonly defaultResponses: RouteResponses;
 
-  constructor({ router, defaultResponses }: ZodApiControllerConfig) {
+  constructor({ router, defaultResponses }: ZodApiControllerConfig = {}) {
     this.router = router ?? express.Router();
     this.defaultResponses = defaultResponses ?? {};
   }
@@ -104,6 +113,7 @@ export class ZodApiController {
         ]
       : middleware;
 
+    // register express route
     this.router = this.router[method](path, ...middlewares, handler);
 
     return this.addRouteToOpenApi({ ...config, responses: { ...this.defaultResponses, ...responses } });
@@ -117,10 +127,10 @@ export class ZodApiController {
 
     const parameters = new Array<ParameterObject>();
     if (params) {
-      this.addParams('path', params, parameters);
+      this.addOpenApiParams('path', params, parameters);
     }
     if (query) {
-      this.addParams('query', query, parameters);
+      this.addOpenApiParams('query', query, parameters);
     }
 
     pathItem[method] = {
@@ -131,7 +141,7 @@ export class ZodApiController {
         ? body instanceof ZodSchema
           ? {
               content: {
-                ['application/json']: {
+                [jsonContent]: {
                   schema: generateSchema(body),
                 },
               },
@@ -143,21 +153,28 @@ export class ZodApiController {
       responses: {},
     };
 
-    Object.entries(responses).forEach(([statusCode, response]) => {
+    Object.entries(responses).forEach(([statusCode, response]: [string, RouteResponse]) => {
       if (pathItem[method]?.responses) {
+        let responseDef = response;
+        if (response instanceof ZodSchema) {
+          const typeName = response._type;
+          if (defaults.emptyResponses.includes(typeName)) {
+            responseDef = { description: defaults.noContent };
+          } else {
+            responseDef = {
+              description: '',
+              content: {
+                [jsonContent]: {
+                  schema: generateSchema(response as SomeZodObject),
+                },
+              },
+            };
+          }
+        }
+
         pathItem[method]!.responses = {
+          [+statusCode]: responseDef,
           ...(pathItem[method]?.responses ?? {}),
-          [statusCode]:
-            response instanceof ZodSchema
-              ? {
-                  description: '',
-                  content: {
-                    'application/json': {
-                      schema: generateSchema(response as SomeZodObject),
-                    },
-                  },
-                }
-              : response,
         };
       }
     });
@@ -167,7 +184,7 @@ export class ZodApiController {
     return this;
   }
 
-  private addParams(
+  private addOpenApiParams(
     inType: 'path' | 'query',
     schema: ZodSchema<any>,
     parameters: ParameterObject[],

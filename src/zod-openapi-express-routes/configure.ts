@@ -15,13 +15,19 @@ export interface ZodOpenApiExpressConfig {
 
   /** An optional object to configure the OpenAPI documentation. */
   docInfo?: {
-    title?: string;
-    version?: string;
+    apiVersion?: string;
     docsTitle?: string;
-    path?: string;
+    docsPath?: string;
     swaggerPath?: string;
   };
 }
+
+const defaults = {
+  apiVersion: '',
+  docsTitle: 'API Reference',
+  docsPath: '/swagger-ui',
+  swaggerPath: '/swagger.json',
+};
 
 /**
  * Registers routes defined using `ZodApiController` with an express app, adds OpenAPI docs (`swagger.json`) and SwaggerUI.
@@ -33,17 +39,15 @@ export function configureOpenApi({
   docInfo,
 }: ZodOpenApiExpressConfig): express.Application {
   // configure common docs
-  const docsPath = docInfo?.path ?? '/api-docs';
-  const swaggerPath = docInfo?.swaggerPath ?? '/swagger.json';
-
-  const title =
-    docInfo?.docsTitle ?? `${docInfo?.title ?? 'API Documentation'} ${docInfo?.version ? `v${docInfo?.version}` : ''}`;
-  const version = docInfo?.version ?? 'N/A';
+  const docsPath = docInfo?.docsPath ?? defaults.docsPath;
+  const swaggerPath = docInfo?.swaggerPath ?? defaults.swaggerPath;
+  const version = docInfo?.apiVersion ?? defaults.apiVersion;
+  const docsTitle = docInfo?.docsTitle ?? defaults.docsTitle;
 
   const docs = {
     openapi: '3.0.0',
     info: {
-      title,
+      title: docsTitle,
       version,
     },
     paths: {},
@@ -69,9 +73,9 @@ export function configureOpenApi({
     docsPath,
     setup(undefined, {
       swaggerUrl: swaggerPath,
-      customSiteTitle: title,
+      customSiteTitle: docsTitle,
       swaggerOptions: { layout: 'BaseLayout' },
-    })
+    }),
   );
 
   return app;

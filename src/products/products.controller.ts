@@ -13,7 +13,7 @@ export const allProductImagesRoute = '/api/products/:productId/images';
 
 const upload = multer({ dest: os.tmpdir() });
 
-export const productController = new ZodApiController({ defaultResponses})
+export const productController = new ZodApiController({ defaultResponses })
   .route(
     {
       method: 'get',
@@ -31,7 +31,7 @@ export const productController = new ZodApiController({ defaultResponses})
         return;
       }
       res.json(product);
-    }
+    },
   )
   .route(
     {
@@ -46,7 +46,7 @@ export const productController = new ZodApiController({ defaultResponses})
     (req, res) => {
       const product = ProductsRepository.createProduct(req.body);
       res.json(product);
-    }
+    },
   )
   .route(
     {
@@ -65,7 +65,7 @@ export const productController = new ZodApiController({ defaultResponses})
         return;
       }
       res.json(product);
-    }
+    },
   )
   .route(
     {
@@ -85,7 +85,7 @@ export const productController = new ZodApiController({ defaultResponses})
         return;
       }
       res.json(result);
-    }
+    },
   )
   .route(
     {
@@ -94,7 +94,7 @@ export const productController = new ZodApiController({ defaultResponses})
       description: 'Delete Product',
       params: productIdParams,
       responses: {
-        204: null,
+        204: z.never(),
       },
     },
     (req, res) => {
@@ -104,7 +104,7 @@ export const productController = new ZodApiController({ defaultResponses})
         return;
       }
       res.status(204).send();
-    }
+    },
   )
   .route(
     {
@@ -123,7 +123,7 @@ export const productController = new ZodApiController({ defaultResponses})
         return;
       }
       res.sendFile(image);
-    }
+    },
   )
   .route(
     {
@@ -143,7 +143,7 @@ export const productController = new ZodApiController({ defaultResponses})
       }
       const filePaths = Array.from(images).map(([id, image]) => `/api/products/${req.params.productId}/images/${id}`);
       res.json(filePaths);
-    }
+    },
   )
   .route(
     {
@@ -202,5 +202,5 @@ export const productController = new ZodApiController({ defaultResponses})
         id: imageId,
         imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,
       });
-    }
+    },
   );

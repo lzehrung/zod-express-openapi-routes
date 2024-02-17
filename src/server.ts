@@ -10,10 +10,9 @@ const server = configureOpenApi({
   app: expressApp,
   controllers: [productController],
   docInfo: {
-    title: 'ACME Products API',
-    version: '0.1.3-dev',
-    docsTitle: 'ACME Products API',
-    path: '/api/reference',
+    apiVersion: '0.1.3-dev',
+    docsTitle: 'ACME Products API Reference',
+    docsPath: '/api/reference',
     swaggerPath: '/api/swagger.json',
   },
 })
