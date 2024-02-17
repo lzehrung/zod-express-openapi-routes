@@ -13,7 +13,7 @@ export const allProductImagesRoute = '/api/products/:productId/images';
 
 const upload = multer({ dest: os.tmpdir() });
 
-export const productController = new ZodApiController(defaultResponses)
+export const productController = new ZodApiController({ defaultResponses})
   .route(
     {
       method: 'get',
