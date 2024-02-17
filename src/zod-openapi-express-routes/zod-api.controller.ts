@@ -19,7 +19,7 @@ type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete';
 export interface RouteConfig<
   TParams extends ZodSchema = ZodSchema,
   TQuery extends ZodSchema = ZodSchema,
-  TBody extends ZodSchema = ZodSchema
+  TBody extends ZodSchema = ZodSchema,
 > {
   /** The HTTP method for the route. */
   method: HttpMethods;
@@ -53,24 +53,28 @@ export interface RouteConfig<
  * Define the responses for a route.
  */
 export interface RouteResponses {
-  [statusCode: number]: ZodSchema | ResponseObject;
+  [statusCode: number]: ZodSchema | ResponseObject | null;
+}
+
+export interface ZodApiControllerConfig {
+  /** Default OpenAPI responses for all routes. */
+  defaultResponses?: RouteResponses;
+
+  /** Express router to use for the controller. */
+  router?: express.Router;
 }
 
 /**
  * A controller that manages express routes and generates OpenAPI paths.
  */
 export class ZodApiController {
-  private router = express.Router();
-  private openApiPaths: PathsObject = {};
+  router: express.Router;
+  openApiPaths: PathsObject = {};
+  readonly defaultResponses: RouteResponses;
 
-  constructor(private defaultResponses: RouteResponses = {}) {}
-
-  get expressRouter(): express.Router {
-    return this.router;
-  }
-
-  get openApiPathsObject(): PathsObject {
-    return this.openApiPaths;
+  constructor({ router, defaultResponses }: ZodApiControllerConfig) {
+    this.router = router ?? express.Router();
+    this.defaultResponses = defaultResponses ?? {};
   }
 
   /**
@@ -80,10 +84,10 @@ export class ZodApiController {
   route<
     TParams extends ZodSchema = ZodSchema,
     TQuery extends ZodSchema = ZodSchema,
-    TBody extends ZodSchema = ZodSchema
+    TBody extends ZodSchema = ZodSchema,
   >(
     config: RouteConfig<TParams, TQuery, TBody>,
-    handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void
+    handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void,
   ): ZodApiController {
     const { method, path, params, query, body, responses, middleware = [] } = config;
 
@@ -100,17 +104,9 @@ export class ZodApiController {
         ]
       : middleware;
 
-    this.router[method](path, ...middlewares, (req, res, next) => {
-      try {
-        handler(req, res, next);
-      } catch (error) {
-        next(error);
-      }
-    });
+    this.router = this.router[method](path, ...middlewares, handler);
 
-    this.addRouteToOpenApi({ ...config, responses: { ...this.defaultResponses, ...responses } });
-
-    return this;
+    return this.addRouteToOpenApi({ ...config, responses: { ...this.defaultResponses, ...responses } });
   }
 
   private addRouteToOpenApi(config: RouteConfig): ZodApiController {
@@ -174,7 +170,7 @@ export class ZodApiController {
   private addParams(
     inType: 'path' | 'query',
     schema: ZodSchema<any>,
-    parameters: ParameterObject[]
+    parameters: ParameterObject[],
   ): ParameterObject[] {
     const schemaObject = generateSchema(schema) as SchemaObject;
     for (const key in schemaObject.properties) {

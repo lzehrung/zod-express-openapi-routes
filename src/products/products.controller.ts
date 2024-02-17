@@ -75,7 +75,7 @@ export const productController = new ZodApiController(defaultResponses)
       params: productIdParams,
       body: product.partial(),
       responses: {
-        204: z.object({}),
+        200: product,
       },
     },
     (req, res) => {
@@ -84,7 +84,7 @@ export const productController = new ZodApiController(defaultResponses)
         res.status(404).send();
         return;
       }
-      res.status(204);
+      res.json(result);
     }
   )
   .route(
@@ -94,7 +94,7 @@ export const productController = new ZodApiController(defaultResponses)
       description: 'Delete Product',
       params: productIdParams,
       responses: {
-        204: z.object({}),
+        204: null,
       },
     },
     (req, res) => {
@@ -103,7 +103,7 @@ export const productController = new ZodApiController(defaultResponses)
         res.status(404).send();
         return;
       }
-      res.status(204);
+      res.status(204).send();
     }
   )
   .route(
@@ -113,7 +113,7 @@ export const productController = new ZodApiController(defaultResponses)
       description: 'Get Product Image',
       params: productImageParams,
       responses: {
-        200: z.any(),
+        200: z.unknown(),
       },
     },
     (req, res) => {

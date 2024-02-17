@@ -24,7 +24,7 @@ export interface ZodOpenApiExpressConfig {
 }
 
 /**
- * Registers routes defined using `ZodApiController` with an express app, adds OpenAPI docs and SwaggerUI.
+ * Registers routes defined using `ZodApiController` with an express app, adds OpenAPI docs (`swagger.json`) and SwaggerUI.
  */
 export function configureOpenApi({
   app,
@@ -50,19 +50,16 @@ export function configureOpenApi({
     ...initialDoc,
   };
 
-  // merge all router paths for common docs
-  for (const router of controllers) {
-    for (const [path, schema] of Object.entries(router.openApiPathsObject)) {
+  // merge all router paths for openapi docs and register express routers
+  for (const controller of controllers) {
+    for (const [path, schema] of Object.entries(controller.openApiPaths)) {
       docs.paths[path] = {
         ...docs.paths[path],
         ...schema,
       };
     }
-  }
 
-  // add all routers
-  for (const router of controllers) {
-    app.use('/', router.expressRouter);
+    app.use('/', controller.router);
   }
 
   // add swagger.json and swagger ui

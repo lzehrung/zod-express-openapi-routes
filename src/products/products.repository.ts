@@ -41,8 +41,7 @@ export class ProductsRepository {
     if (!product) {
       return null;
     }
-    Object.assign(product, params);
-    return product;
+    return products[products.indexOf(product)] = Object.assign(product, params);
   }
 
   static deleteProduct(id: number): boolean {

@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { configureOpenApi } from './zod-openapi-express-routes/zod-to-openapi';
+import { configureOpenApi } from './zod-openapi-express-routes/configure';
 import { productController } from './products/products.controller';
 
 const expressApp = express()
