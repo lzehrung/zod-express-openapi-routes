@@ -1,18 +1,24 @@
-import { zodiosApiApp } from "./zodios-helpers";
-import productsController from "./products/products-controller";
+import express, { Request, Response, NextFunction } from 'express';
+import { configureOpenApi } from './zod-openapi-express-routes/configure';
+import { productController } from './products/products.controller';
 
-const app = zodiosApiApp(
-  {
-    title: "ACME Products API",
-    version: "1.0.0",
-    docsPath: `/api/reference`,
-    swaggerPath: `/api/swagger.json`,
+const expressApp = express()
+  .use(express.json({ limit: '1mb' }))
+  .use(express.urlencoded({ extended: false, limit: '1mb' }));
+
+const server = configureOpenApi({
+  app: expressApp,
+  controllers: [productController],
+  docInfo: {
+    apiVersion: '0.1.3-dev',
+    docsTitle: 'ACME Products API Reference',
+    docsPath: '/api/reference',
+    swaggerPath: '/api/swagger.json',
   },
-  [productsController]
-);
+})
+  .use((req, res) => res.redirect('/api/reference'))
+  .use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    res.status(500).json({ message: 'Internal server error', error: err });
+  });
 
-app.use("*", (req, res) => {
-  res.redirect("/api/reference");
-});
-
-export default app;
+export default server;

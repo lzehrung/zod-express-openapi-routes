@@ -1,6 +1,6 @@
-import { Product } from "../db/models";
-import { getListParam } from "./api-schemas";
-import { z } from "zod";
+import { Product } from '../db/models';
+import { getListParam } from './api-schemas';
+import { z } from 'zod';
 
 const products = new Array<Product>();
 for (let i = 1; i <= 10; i++) {
@@ -14,7 +14,7 @@ for (let i = 1; i <= 10; i++) {
 
 const productImages = new Map<number, Map<number, string>>();
 
-export class ProductRepository {
+export class ProductsRepository {
   static getProduct(id: number): Product | null {
     return products.find((p) => p.id === id) || null;
   }
@@ -23,6 +23,9 @@ export class ProductRepository {
     return products.filter((x) => {
       if (params.name) {
         return x.name.indexOf(params.name) > -1;
+      }
+      if (params.categories) {
+        return params.categories.every((c) => x.categories.indexOf(c) > -1);
       }
       return true;
     });
@@ -38,8 +41,7 @@ export class ProductRepository {
     if (!product) {
       return null;
     }
-    Object.assign(product, params);
-    return product;
+    return products[products.indexOf(product)] = Object.assign(product, params);
   }
 
   static deleteProduct(id: number): boolean {
@@ -56,8 +58,7 @@ export class ProductRepository {
   }
 
   static createProductImage(productId: number, file: string): number {
-    const productImageMap =
-      productImages.get(productId) ?? new Map<number, string>();
+    const productImageMap = productImages.get(productId) ?? new Map<number, string>();
     const imageId = productImageMap.size;
     productImageMap.set(imageId, file);
     productImages.set(productId, productImageMap);

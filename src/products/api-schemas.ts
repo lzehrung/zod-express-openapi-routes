@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { z } from 'zod';
+import { jsonString } from '../helpers';
 
 export const product = z.object({
   id: z.number(),
@@ -10,7 +11,15 @@ export const product = z.object({
 // list of products schema
 export const productList = z.array(product);
 
+export const productIdParams = z.object({
+  productId: z.coerce.number(),
+});
+
+export const productImageParams = productIdParams.extend({
+  imageId: z.coerce.number(),
+});
+
 export const getListParam = z.object({
   name: product.shape.name.optional(),
-  categories: product.shape.categories.optional(),
+  categories: jsonString(product.shape.categories).optional(),
 });

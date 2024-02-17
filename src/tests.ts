@@ -1,17 +1,18 @@
-import request from "supertest";
-import assert from "assert";
-import OpenAPISchemaValidator from "openapi-schema-validator";
+import request from 'supertest';
+import assert from 'assert';
+import OpenAPISchemaValidator from 'openapi-schema-validator';
 
-import app from "./server";
-import { productList } from "./products/api-schemas";
+import server from './server';
+import { productList } from './products/api-schemas';
+import { SafeParseError } from 'zod';
 
 (async () => {
   console.log(`Starting tests\r\n\r\n`);
 
   console.log(`get swagger.json`);
-  await request(app)
-    .get("/api/swagger.json")
-    .expect("Content-Type", /json/)
+  await request(server)
+    .get('/api/swagger.json')
+    .expect('Content-Type', /json/)
     .expect(200)
     .then((res) => {
       assert(!!res.body, `expected swagger.json`);
@@ -22,11 +23,7 @@ import { productList } from "./products/api-schemas";
       const validationResults = openapiValidator.validate(res.body);
       assert(
         validationResults.errors.length === 0,
-        `expected no swagger.json validation errors:\r\n${JSON.stringify(
-          validationResults.errors,
-          null,
-          2
-        )}`
+        failMsg(`expected no swagger.json validation errors`, validationResults.errors)
       );
       console.log(`pass!\r\n`);
     })
@@ -35,18 +32,15 @@ import { productList } from "./products/api-schemas";
     });
 
   console.log(`get list`);
-  request(app)
-    .get("/api/products")
-    .expect("Content-Type", /json/)
+  request(server)
+    .get('/api/products')
+    .expect('Content-Type', /json/)
     .expect(200)
     .then((res) => {
+      const result = productList.safeParse(res.body);
       assert(
-        productList.safeParse(res.body).success,
-        `get list zod schema validation failed:\r\n${JSON.stringify(
-          res.body,
-          null,
-          2
-        )}`
+        result.success,
+        failMsg(`get list zod schema validation failed`, (result as SafeParseError<unknown>).error)
       );
       console.log(`pass!\r\n`);
     })
@@ -54,3 +48,7 @@ import { productList } from "./products/api-schemas";
       console.error(err);
     });
 })();
+
+function failMsg(msg: string, data: unknown) {
+  return `${msg}\r\n${JSON.stringify(data, null, 2)}`;
+}
