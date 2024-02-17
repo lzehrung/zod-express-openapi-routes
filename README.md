@@ -15,7 +15,7 @@
 
 - clone the repository
 - `npm install`
-- `npm run start`
+- `npm run dev`
 - open the generated OpenAPI docs http://localhost:3250/api/reference
 - open the generated `swagger.json` http://localhost:3250/api/swagger.json
 - get a single resource http://localhost:3250/api/products/1
