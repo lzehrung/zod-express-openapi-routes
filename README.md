@@ -24,6 +24,9 @@
 ## Dependencies
 
 - `@anatine/zod-openapi`: generates request parameter OpenAPI definitions from zod schemas
+- `openapi3-ts`: used to define OpenAPI schema in TypeScript
+- `swagger-ui-express`: serves the OpenAPI documentation
+- `zod`: used to define request parameter validation schemas
 
 ## Limitations
 
