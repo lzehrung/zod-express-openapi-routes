@@ -1,7 +1,8 @@
 import express from 'express';
 import { OpenAPIObject } from 'openapi3-ts/oas31';
 import { serve, setup } from 'swagger-ui-express';
-import { ZodApiController } from './zod-api.controller';
+import { ZodApiController, mergeDeep } from './zod-api.controller';
+import { PathObject } from 'openapi3-ts/oas30';
 
 export interface ZodOpenApiExpressConfig {
   /** The express app to register the routes with. */
@@ -10,23 +11,22 @@ export interface ZodOpenApiExpressConfig {
   /** An array of `ZodApiController` instances. */
   controllers: ZodApiController[];
 
-  /** An optional initial OpenAPI document to merge with the generated document. */
-  initialDoc?: OpenAPIObject;
+  /** Express app route to the Swagger UI documentation page. */
+  docsRoute?: string;
 
-  /** An optional object to configure the OpenAPI documentation. */
-  docInfo?: {
-    apiVersion?: string;
-    docsTitle?: string;
-    docsPath?: string;
-    swaggerPath?: string;
-  };
+  /** Server host path to swagger.json. */
+  swaggerRoute?: string;
+
+  /** An optional initial OpenAPI document to merge with the generated document. */
+  schema?: Partial<OpenAPIObject>;
 }
 
 const defaults = {
-  apiVersion: '',
+  apiVersion: '1.0.0',
   docsTitle: 'API Reference',
-  docsPath: '/swagger-ui',
-  swaggerPath: '/swagger.json',
+  swaggerUiRoute: '/swagger-ui',
+  swaggerRoute: '/swagger.json',
+  openApiVersion: '3.0.0',
 };
 
 /**
@@ -35,45 +35,44 @@ const defaults = {
 export function configureOpenApi({
   app,
   controllers,
-  initialDoc,
-  docInfo,
+  schema,
+  docsRoute,
+  swaggerRoute,
 }: ZodOpenApiExpressConfig): express.Application {
-  // configure common docs
-  const docsPath = docInfo?.docsPath ?? defaults.docsPath;
-  const swaggerPath = docInfo?.swaggerPath ?? defaults.swaggerPath;
-  const version = docInfo?.apiVersion ?? defaults.apiVersion;
-  const docsTitle = docInfo?.docsTitle ?? defaults.docsTitle;
+  const version = schema?.info?.version ?? defaults.apiVersion;
+  const title = schema?.info?.title ?? defaults.docsTitle;
 
-  const docs = {
-    openapi: '3.0.0',
-    info: {
-      title: docsTitle,
-      version,
-    },
-    paths: {},
-    ...initialDoc,
-  };
+  const apiSchema = mergeDeep(
+    {
+      openapi: defaults.openApiVersion,
+      info: {
+        title,
+        version,
+      },
+      paths: {},
+    } as {},
+    schema ?? ({} as {}),
+  ) as OpenAPIObject;
 
   // merge all router paths for openapi docs and register express routers
   for (const controller of controllers) {
     for (const [path, schema] of Object.entries(controller.openApiPaths)) {
-      docs.paths[path] = {
-        ...docs.paths[path],
-        ...schema,
-      };
+      apiSchema.paths![path] = mergeDeep(apiSchema.paths![path] as {}, schema as {}) as PathObject;
     }
 
     app.use('/', controller.router);
   }
 
   // add swagger.json and swagger ui
-  app.use(swaggerPath, (_, res) => res.json(docs));
-  app.use(docsPath, serve);
+  const swaggerUiRoute = docsRoute ?? defaults.swaggerUiRoute;
+  const swaggerJsonRoute = swaggerRoute ?? defaults.swaggerRoute;
+  app.use(swaggerJsonRoute, (_, res) => res.json(apiSchema));
+  app.use(swaggerUiRoute, serve);
   app.use(
-    docsPath,
+    swaggerUiRoute,
     setup(undefined, {
-      swaggerUrl: swaggerPath,
-      customSiteTitle: docsTitle,
+      swaggerUrl: swaggerJsonRoute,
+      customSiteTitle: title,
       swaggerOptions: { layout: 'BaseLayout' },
     }),
   );

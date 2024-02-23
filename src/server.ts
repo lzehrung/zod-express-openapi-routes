@@ -9,11 +9,22 @@ const expressApp = express()
 const server = configureOpenApi({
   app: expressApp,
   controllers: [productController],
-  docInfo: {
-    apiVersion: '0.1.3-dev',
-    docsTitle: 'ACME Products API Reference',
-    docsPath: '/api/reference',
-    swaggerPath: '/api/swagger.json',
+  docsRoute: '/api/reference',
+  swaggerRoute: '/api/swagger.json',
+  schema: {
+    info: {
+      title: 'ACME Products API Reference',
+      version: '0.1.3-dev',
+    },
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'session.id',
+        },
+      },
+    },
   },
 })
   .use((req, res) => res.redirect('/api/reference'))

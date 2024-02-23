@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { getListParam, product, productIdParams, productImageParams, productList } from './api-schemas';
-import { ProductsRepository } from './products.repository';
+import { ProductsService } from './products.service';
 import multer from 'multer';
 import os from 'os';
 import { ZodApiController } from '../zod-openapi-express-routes/zod-api.controller';
@@ -14,10 +14,9 @@ export const allProductImagesRoute = '/api/products/:productId/images';
 const upload = multer({ dest: os.tmpdir() });
 
 export const productController = new ZodApiController({ defaultResponses })
-  .route(
+  .get(
+    allProductsRoute,
     {
-      method: 'get',
-      path: allProductsRoute,
       description: 'Get Products',
       query: getListParam,
       responses: {
@@ -25,7 +24,7 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const product = ProductsRepository.getProducts({ ...req.query });
+      const product = ProductsService.getProducts({ ...req.query });
       if (!product) {
         res.status(404).json({ message: 'Product not found', data: req.query }).send();
         return;
@@ -33,10 +32,9 @@ export const productController = new ZodApiController({ defaultResponses })
       res.json(product);
     },
   )
-  .route(
+  .post(
+    allProductsRoute,
     {
-      method: 'post',
-      path: allProductsRoute,
       description: 'Create product',
       body: product,
       responses: {
@@ -44,14 +42,13 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const product = ProductsRepository.createProduct(req.body);
+      const product = ProductsService.createProduct(req.body);
       res.json(product);
     },
   )
-  .route(
+  .get(
+    singleProductRoute,
     {
-      method: 'get',
-      path: singleProductRoute,
       description: 'Get Product',
       params: productIdParams,
       responses: {
@@ -59,7 +56,7 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const product = ProductsRepository.getProduct(req.params.productId);
+      const product = ProductsService.getProduct(req.params.productId);
       if (!product) {
         res.status(404).send();
         return;
@@ -67,10 +64,9 @@ export const productController = new ZodApiController({ defaultResponses })
       res.json(product);
     },
   )
-  .route(
+  .patch(
+    singleProductRoute,
     {
-      method: 'patch',
-      path: singleProductRoute,
       description: 'Update Product',
       params: productIdParams,
       body: product.partial(),
@@ -79,7 +75,7 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const result = ProductsRepository.updateProduct(req.params.productId, req.body);
+      const result = ProductsService.updateProduct(req.params.productId, req.body);
       if (!result) {
         res.status(404).send();
         return;
@@ -87,10 +83,9 @@ export const productController = new ZodApiController({ defaultResponses })
       res.json(result);
     },
   )
-  .route(
+  .delete(
+    singleProductRoute,
     {
-      method: 'delete',
-      path: singleProductRoute,
       description: 'Delete Product',
       params: productIdParams,
       responses: {
@@ -98,7 +93,7 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const result = ProductsRepository.deleteProduct(req.params.productId);
+      const result = ProductsService.deleteProduct(req.params.productId);
       if (!result) {
         res.status(404).send();
         return;
@@ -106,10 +101,9 @@ export const productController = new ZodApiController({ defaultResponses })
       res.status(204).send();
     },
   )
-  .route(
+  .get(
+    singleProductImageRoute,
     {
-      method: 'get',
-      path: singleProductImageRoute,
       description: 'Get Product Image',
       params: productImageParams,
       responses: {
@@ -117,18 +111,24 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const image = ProductsRepository.getProductImage(req.params.productId, req.params.imageId);
+      const image = ProductsService.getProductImage(req.params.productId, req.params.imageId);
       if (!image) {
         res.status(404).send();
         return;
       }
-      res.sendFile(image);
+      res.sendFile(image.path, {
+        headers: {
+          'Content-Type': image.mimetype,
+          'Content-Length': image.size,
+          'Content-Disposition': `inline; filename=${image.originalname}`,
+          'File-Name': image.originalname,
+        },
+      });
     },
   )
-  .route(
+  .get(
+    allProductImagesRoute,
     {
-      method: 'get',
-      path: allProductImagesRoute,
       description: 'Get Product Images',
       params: productIdParams,
       responses: {
@@ -136,19 +136,20 @@ export const productController = new ZodApiController({ defaultResponses })
       },
     },
     (req, res) => {
-      const images = ProductsRepository.getProductImages(req.params.productId);
-      if (!images || images.size === 0) {
+      const images = ProductsService.getProductImages(req.params.productId);
+      if (!images || Object.keys(images).length === 0) {
         res.json([]);
         return;
       }
-      const filePaths = Array.from(images).map(([id, image]) => `/api/products/${req.params.productId}/images/${id}`);
+      const filePaths = Array.from(Object.entries(images)).map(
+        ([id, image]) => `/api/products/${req.params.productId}/images/${id}`,
+      );
       res.json(filePaths);
     },
   )
-  .route(
+  .post(
+    allProductImagesRoute,
     {
-      method: 'post',
-      path: allProductImagesRoute,
       description: 'Upload a product image',
       middleware: [upload.single('imageFile')],
       params: z.object({
@@ -197,7 +198,7 @@ export const productController = new ZodApiController({ defaultResponses })
         res.status(400).send();
         return;
       }
-      const imageId = ProductsRepository.createProductImage(Number(req.params.productId), req.file.path);
+      const imageId = ProductsService.createProductImage(Number(req.params.productId), req.file);
       res.status(201).json({
         id: imageId,
         imageUrl: `/api/products/${req.params.productId}/images/${imageId}`,
