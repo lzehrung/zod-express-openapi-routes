@@ -1,8 +1,9 @@
 import express from 'express';
-import { OpenAPIObject } from 'openapi3-ts/oas31';
-import { serve, setup } from 'swagger-ui-express';
-import { ZodApiController, mergeDeep } from './zod-api.controller';
-import { PathObject } from 'openapi3-ts/oas30';
+import {OpenAPIObject} from 'openapi3-ts/oas31';
+import {serve, setup} from 'swagger-ui-express';
+import {ZodApiController, mergeDeep} from './zod-api.controller';
+import {PathObject} from 'openapi3-ts/oas30';
+import * as fs from "fs";
 
 export interface ZodOpenApiExpressConfig {
   /** The express app to register the routes with. */
@@ -19,6 +20,9 @@ export interface ZodOpenApiExpressConfig {
 
   /** An optional initial OpenAPI document to merge with the generated document. */
   schema?: Partial<OpenAPIObject>;
+
+  /** An optional flag to save the generated swagger.json to a file on startup. */
+  saveToFile?: boolean;
 }
 
 const defaults = {
@@ -33,12 +37,13 @@ const defaults = {
  * Registers routes defined using `ZodApiController` with an express app, adds OpenAPI docs (`swagger.json`) and SwaggerUI.
  */
 export function configureOpenApi({
-  app,
-  controllers,
-  schema,
-  docsRoute,
-  swaggerRoute,
-}: ZodOpenApiExpressConfig): express.Application {
+                                   app,
+                                   controllers,
+                                   schema,
+                                   docsRoute,
+                                   swaggerRoute,
+                                   saveToFile,
+                                 }: ZodOpenApiExpressConfig): express.Application {
   const version = schema?.info?.version ?? defaults.apiVersion;
   const title = schema?.info?.title ?? defaults.docsTitle;
 
@@ -66,6 +71,12 @@ export function configureOpenApi({
   // add swagger.json and swagger ui
   const swaggerUiRoute = docsRoute ?? defaults.swaggerUiRoute;
   const swaggerJsonRoute = swaggerRoute ?? defaults.swaggerRoute;
+
+  if (saveToFile) {
+    // write swagger.json to file
+    fs.writeFileSync('swagger.json', JSON.stringify(apiSchema));
+  }
+
   app.use(swaggerJsonRoute, (_, res) => res.json(apiSchema));
   app.use(swaggerUiRoute, serve);
   app.use(
@@ -73,7 +84,7 @@ export function configureOpenApi({
     setup(undefined, {
       swaggerUrl: swaggerJsonRoute,
       customSiteTitle: title,
-      swaggerOptions: { layout: 'BaseLayout' },
+      swaggerOptions: {layout: 'BaseLayout'},
     }),
   );
 

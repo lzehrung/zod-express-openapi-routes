@@ -19,7 +19,7 @@ type HttpMethods = 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options' | 'he
 //   operation: Omit<OperationObject, 'parameters' | 'requestBody' | 'responses' | 'description'>
 // }>;
 
-/** Define other OpenAPI schema fields that are not already set from the route config. */
+/** OpenAPI schema that excludes fields inferred from a route config. */
 type OpenApiOperationOptions = Omit<OperationObject, 'parameters' | 'requestBody' | 'responses' | 'description'>;
 
 /**
@@ -29,6 +29,7 @@ export type RouteConfig<
   TParams extends ZodSchema = ZodSchema,
   TQuery extends ZodSchema = ZodSchema,
   TBody extends ZodSchema = ZodSchema,
+  THeaders extends ZodSchema = ZodSchema,
 > = {
   /** The HTTP method for the route. */
   method: HttpMethods;
@@ -42,6 +43,9 @@ export type RouteConfig<
   /** A Zod schema for the request body. Used to generate OpenAPI parameter definition. */
   body?: TBody | RequestBodyObject;
 
+  /** A Zod schema for the request headers. Used to generate OpenAPI parameter definition. */
+  headers?: THeaders;
+
   /** OpenAPI description of the route. */
   description?: string;
 
@@ -51,6 +55,8 @@ export type RouteConfig<
   /** Middleware to run before the route handler. */
   middleware?: RequestHandler[];
 } & OpenApiOperationOptions;
+
+type ShortRouteConfig<TParams extends ZodSchema = ZodSchema, TQuery extends ZodSchema = ZodSchema, TBody extends ZodSchema = ZodSchema> = Omit<RouteConfig<TParams, TQuery, TBody>, 'method'>;
 
 export type RouteResponse = ZodSchema | ResponseObject;
 
@@ -98,7 +104,7 @@ export class ZodApiController {
    * Define an express route with Zod-validated request parameters, query,
    * and body and create OpenAPI definitions for it.
    *
-   * @param path The express route path in the format `/segment/:param`.
+   * @param path The express route path in the format `/segment/:param`. Must be from the root, not relative.
    * @param config The route configuration.
    * @param handler The route handler.
    */
@@ -111,8 +117,8 @@ export class ZodApiController {
     config: RouteConfig<TParams, TQuery, TBody>,
     handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void,
   ): ZodApiController {
-    const { method, params, query, body, responses, middleware = [] } = config;
-
+    const { method, params, query, body, responses, middleware = [], operationId: initialOperationId } = config;
+    const operationId = initialOperationId ?? `${method}_${path}`;
     const validate = params != null || query != null || (body != null && body instanceof ZodSchema);
 
     const middlewares = validate
@@ -129,13 +135,13 @@ export class ZodApiController {
     // register express route
     this.router = this.router[method](path, ...middlewares, handler);
 
-    return this.addRouteToOpenApi(path, { ...config, responses: { ...this.defaultResponses, ...responses } });
+    return this.addRouteToOpenApi(path, { ...config, responses: { ...this.defaultResponses, ...responses }, operationId });
   }
 
   // Shortcut for `route` with `method: 'get'`
   get<TParams extends ZodSchema = ZodSchema, TQuery extends ZodSchema = ZodSchema, TBody extends ZodSchema = ZodSchema>(
     path: string,
-    config: Omit<RouteConfig<TParams, TQuery, TBody>, 'method'>,
+    config: ShortRouteConfig<TParams, TQuery, TBody>,
     handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void,
   ): ZodApiController {
     return this.route(path, { ...config, method: 'get' }, handler);
@@ -157,7 +163,7 @@ export class ZodApiController {
   // Shortcut for `route` with `method: 'put'`
   put<TParams extends ZodSchema = ZodSchema, TQuery extends ZodSchema = ZodSchema, TBody extends ZodSchema = ZodSchema>(
     path: string,
-    config: Omit<RouteConfig<TParams, TQuery, TBody>, 'method'>,
+    config: ShortRouteConfig<TParams, TQuery, TBody>,
     handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void,
   ): ZodApiController {
     return this.route(path, { ...config, method: 'put' }, handler);
@@ -183,7 +189,7 @@ export class ZodApiController {
     TBody extends ZodSchema = ZodSchema,
   >(
     path: string,
-    config: Omit<RouteConfig<TParams, TQuery, TBody>, 'method'>,
+    config: ShortRouteConfig<TParams, TQuery, TBody>,
     handler: (req: TypedRequest<TParams, TQuery, TBody>, res: Response, next: NextFunction) => void,
   ): ZodApiController {
     return this.route(path, { ...config, method: 'delete' }, handler);

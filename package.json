@@ -8,7 +8,9 @@
     "build": "tsc -b ./tsconfig.json",
     "dev": "tsnd --inspect=9340 -- src/main.ts",
     "debug": "node --loader ts-node/esm --inspect-brk=9340 .\\src\\main.ts",
-    "test": "npm run build && node ./dist/tests.js"
+    "test": "tsnd src/tests.ts",
+    "ogen": "npx openapi-generator-cli generate -i ./swagger.json -g typescript-fetch -o ./clients/openapi-generator-client",
+    "swgen": "java -jar swagger-codegen-cli-3.0.54.jar generate -i swagger.json -l typescript-fetch -o ./clients/swagger-codegen-client"
   },
   "keywords": [],
   "author": "Luke Zehrung",
@@ -21,6 +23,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.3",
     "@types/express": "^4.17.21",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.19",
@@ -31,6 +34,7 @@
     "openapi3-ts": "^4.1.2",
     "prettier": "^3.2.5",
     "supertest": "^6.3.4",
+    "swagger-typescript-codegen": "^3.2.4",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   }

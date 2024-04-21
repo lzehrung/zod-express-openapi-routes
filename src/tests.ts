@@ -9,7 +9,7 @@ import { SafeParseError } from 'zod';
 (async () => {
   console.log(`Starting tests\r\n\r\n`);
 
-  console.log(`get swagger.json`);
+  console.log(`get and validate swagger.json`);
   await request(server)
     .get('/api/swagger.json')
     .expect('Content-Type', /json/)
@@ -31,7 +31,7 @@ import { SafeParseError } from 'zod';
       console.error(err);
     });
 
-  console.log(`get list`);
+  console.log(`get product list`);
   request(server)
     .get('/api/products')
     .expect('Content-Type', /json/)
